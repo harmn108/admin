@@ -8,6 +8,8 @@ imports:
 parameters:
     locale: en
 
+nelmio_api_doc: ~
+
 framework:
     #esi: ~
     #translator: { fallbacks: ['%locale%'] }
