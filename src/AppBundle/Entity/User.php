@@ -11,6 +11,7 @@ use AppBundle\Entity\Role;
  *
  * @ORM\Table(name="user")
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks
  */
 class User
 {
@@ -69,6 +70,34 @@ class User
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
      */
     private $roleId;
+
+    /**
+     * @var integer $createdBy
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="created_by", referencedColumnName="id")
+     */
+    private $createdBy;
+
+    /**
+     * @var datetime $createdAt
+     *
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
+
+    /**
+     * @var integer $updatedBy
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="updated_by", referencedColumnName="id")
+     */
+    private $updatedBy;
+
+    /**
+     * @var datetime $updatedBy
+     *
+     * @ORM\Column(type="datetime")
+     */
+    private $updatedAt;
 
     /**
      * Get id
@@ -201,6 +230,54 @@ class User
     }
 
     /**
+     * Set createdAt
+     *
+     * @param \DateTime $createdAt
+     *
+     * @return User
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * Get createdAt
+     *
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Set updatedAt
+     *
+     * @param \DateTime $updatedAt
+     *
+     * @return User
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get updatedAt
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
      * Set roleId
      *
      * @param \AppBundle\Entity\Role $roleId
@@ -222,5 +299,69 @@ class User
     public function getRoleId()
     {
         return $this->roleId;
+    }
+
+    /**
+     * Set createdBy
+     *
+     * @param \AppBundle\Entity\User $createdBy
+     *
+     * @return User
+     */
+    public function setCreatedBy(\AppBundle\Entity\User $createdBy = null)
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    /**
+     * Get createdBy
+     *
+     * @return \AppBundle\Entity\User
+     */
+    public function getCreatedBy()
+    {
+        return $this->createdBy;
+    }
+
+    /**
+     * Set updatedBy
+     *
+     * @param \AppBundle\Entity\User $updatedBy
+     *
+     * @return User
+     */
+    public function setUpdatedBy(\AppBundle\Entity\User $updatedBy = null)
+    {
+        $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    /**
+     * Get updatedBy
+     *
+     * @return \AppBundle\Entity\User
+     */
+    public function getUpdatedBy()
+    {
+        return $this->updatedBy;
+    }
+
+    /**
+     *
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function updatedTimestamps()
+    {
+        $currentDiteTime = new \DateTime('now');
+
+        $this->setUpdatedAt($currentDiteTime);
+
+        if ($this->getCreatedAt() == null) {
+            $this->setCreatedAt($currentDiteTime);
+        }
     }
 }
