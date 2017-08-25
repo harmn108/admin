@@ -13,7 +13,9 @@
     <body>
         {% block body %}{% endblock %}
         {% block javascripts %}
-            {% javascripts '@AppBundle/Resources/public/js/*' %}
+            {% javascripts
+            '@AppBundle/Resources/public/js/jquery-3.2.1.min.js'
+            '@AppBundle/Resources/public/js/*' %}
                 <script src="{{ asset_url }}"></script>
             {% endjavascripts %}
         {% endblock %}
