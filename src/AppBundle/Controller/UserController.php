@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -55,7 +56,8 @@ class UserController extends Controller
     {
         $form = $this->createFormBuilder()
             ->add('email', TextType::class)
-            ->add('password', TextType::class)
+            ->add('password', PasswordType::class, ['attr'   =>  array('class'   => 'c4')]
+            )
             ->add('save', SubmitType::class, array('label' => 'Login'))
             ->getForm();
 
