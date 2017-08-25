@@ -33,7 +33,6 @@ class UserController extends Controller
      */
     public function indexAction(Request $request)
     {
-        // replace this example code with whatever you need
         return $this->render('default/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
         ]);
@@ -55,14 +54,34 @@ class UserController extends Controller
     public function loginAction()
     {
         $form = $this->createFormBuilder()
-            ->add('email', TextType::class)
-            ->add('password', PasswordType::class, ['attr'   =>  array('class'   => 'c4')]
-            )
-            ->add('save', SubmitType::class, array('label' => 'Login'))
+            ->setAction('login_check')
+            ->setMethod('POST')
+            ->setAttributes(['class' => 'form-group'])
+            ->add('email', TextType::class, ['attr'   =>  array('class'   => 'form-control')])
+            ->add('password', PasswordType::class, ['attr'   =>  array('class'   => 'form-control')])
+            ->add('Sign In', SubmitType::class, ['attr'   =>  array('class'   => 'btn btn-primary btn-block', 'label' => 'SignIn')])
             ->getForm();
 
         return $this->render('user/login.html.twig', array(
             'form' => $form->createView(),
         ));
+    }
+    
+    /**
+     * @Route("/login_check")
+     * @Method({"POST"})
+     *
+     * @ApiDoc(
+     *   resource=true,
+     *   description="This REST is for first step of authentication",
+     *   statusCodes={
+     *     200="Success",
+     *     404="Not found"
+     *   }
+     * )
+     */
+    public function loginCheckAction(Request $request)
+    {
+        return new JsonResponse($request->getContent());
     }
 }
