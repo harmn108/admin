@@ -147,8 +147,7 @@ class UserController extends Controller
             return $this->redirect('login');
         }
 
-        echo "<pre>"; print_r('test77'); echo "</pre>"; die();
-        return new JsonResponse(Response::$statusTexts[Response::HTTP_OK], Response::HTTP_OK);
+        return $this->render('user/admin.html.twig');
     }
 
     private function isLoggedInAction()
@@ -168,5 +167,24 @@ class UserController extends Controller
        }
 
         return false;
+    }
+
+    /**
+     * @Route("/logout")
+     * @Method({"GET", "POST"})
+     *
+     * @ApiDoc(
+     *   resource=true,
+     *   description="This REST is ",
+     *   statusCodes={
+     *     200="Success",
+     *     404="Not found"
+     *   }
+     * )
+     */
+    public function logoutAction(){
+        unset($_COOKIE);
+        setcookie('X-API-TOKEN', '', time()-3600);
+        return $this->redirect('login');
     }
 }

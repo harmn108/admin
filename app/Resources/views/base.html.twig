@@ -11,7 +11,9 @@
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
+        {% block header %}{% endblock %}
         {% block body %}{% endblock %}
+        {% block footer %}{% endblock %}
         {% block javascripts %}
             {% javascripts
             '@AppBundle/Resources/public/js/jquery-3.2.1.min.js'
