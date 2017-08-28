@@ -1,3 +1,29 @@
+html, body {
+    height: 100%;
+}
+.container-fluid {
+    margin: 0 auto;
+    height: 100%;
+    padding: 20px 20px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#action_nav .navbar-nav li a {
+    line-height: 53px;
+    height: 53px;
+    padding-top: 0;
+}
+
+a{
+    color: white;
+}
+
+.m-top-5{
+    margin-top: 5px;
+}
+
 .m-top-10{
     margin-top: 10px;
 }
@@ -8,4 +34,8 @@
 
 .m-top-20{
     margin-top: 20px;
+}
+
+.m-top-5{
+    margin-top: 5px;
 }

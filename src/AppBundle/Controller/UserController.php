@@ -17,6 +17,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class UserController extends Controller
 {
@@ -116,7 +117,20 @@ class UserController extends Controller
                 $em->persist($user);
                 $em->flush();
 
-                setcookie('X-API-TOKEN', $token, time()+3600, "/");
+                setcookie('X-TOKEN', $token, time()+3600, "/");
+
+                $session = new Session();
+
+                $userInfo = [];
+                $userInfo['firstName'] = $user->getFirstName();
+                $userInfo['lastName'] = $user->getLastName();
+                $userInfo['email'] = $user->getEmail();
+                $userInfo['roleId'] = $user->getRoleId()->getId();
+                $userInfo['roleName'] = $user->getRoleId()->getName();
+
+                $userInfo['pages'] = ['Structure', 'Media', 'Article']; // from DB
+
+                $session->set($token, $userInfo);
 
                 return $this->redirect('admin');
             }
@@ -152,14 +166,14 @@ class UserController extends Controller
 
     private function isLoggedInAction()
     {
-       if(isset($_COOKIE['X-API-TOKEN']) && $_COOKIE['X-API-TOKEN']){
+       if(isset($_COOKIE['X-TOKEN']) && $_COOKIE['X-TOKEN']){
            $em = $this->getDoctrine()->getManager();
            $repository = $em->getRepository(User::class);
 
            /**
             * @var $user User
             */
-           $user = $repository->findOneBy(['token' => md5($_COOKIE['X-API-TOKEN'])]);
+           $user = $repository->findOneBy(['token' => md5($_COOKIE['X-TOKEN'])]);
 
            if ($user !== null) {
                return true;
@@ -183,8 +197,47 @@ class UserController extends Controller
      * )
      */
     public function logoutAction(){
-        unset($_COOKIE);
-        setcookie('X-API-TOKEN', '', time()-3600);
-        return $this->redirect('login');
+        if (isset($_COOKIE['X-TOKEN'])) {
+            $this->get('session')->remove($_COOKIE['X-TOKEN']);
+            unset($_COOKIE['X-TOKEN']);
+            setcookie('X-TOKEN', null, -1, '/');
+            return $this->redirect('login');
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @Route("/control")
+     * @Method({"GET"})
+     *
+     * @ApiDoc(
+     *   resource=true,
+     *   description="This REST is ",
+     *   statusCodes={
+     *     200="Success",
+     *     404="Not found"
+     *   }
+     * )
+     */
+    public function controlAction(){
+        return $this->render('user/control.html.twig');
+    }
+
+    /**
+     * @Route("/access")
+     * @Method({"GET"})
+     *
+     * @ApiDoc(
+     *   resource=true,
+     *   description="This REST is ",
+     *   statusCodes={
+     *     200="Success",
+     *     404="Not found"
+     *   }
+     * )
+     */
+    public function accessAction(){
+        return $this->render('user/access.html.twig');
     }
 }

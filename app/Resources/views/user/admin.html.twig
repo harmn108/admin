@@ -1,29 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Admin Page{% endblock %}
+{% block title %}Admin{% endblock %}
 
-{% block header %}
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Logo</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#">Bootstrap theme</a>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse navbar-right">
-                <ul class="nav navbar-nav">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Action <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="{{ path('app_user_logout') }}">Sign Out</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+{% block bodyLeft %}
+    <div class="row">
+        <div class="col-lg-12">test1</div>
+    </div>
+{% endblock %}
+
+{% block bodyRight %}
+    <div class="row">
+        <div class="col-lg-12">test2</div>
+    </div>
 {% endblock %}

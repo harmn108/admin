@@ -1,1 +1,24 @@
-{% block header %}{% endblock %}
+{% block header %}
+    <header>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <nav class="navbar navbar-light navbar-fixed-top" style="background-color: #243240;">
+                        <div class="container">
+                            <div class="navbar-header">
+                                <a class="navbar-brand" href="{{ path('app_user_admin') }}">Admin</a>
+                            </div>
+                            <div id="navbar-right" class="navbar-collapse collapse navbar-right">
+                                <ul class="nav navbar-nav">
+                                    <li><a href="{{ path('app_user_control') }}">Control Panel</a></li>
+                                    <li><a href="{{ path('app_user_access') }}">Access</a></li>
+                                    <li><a href="{{ path('app_user_logout') }}">Sign Out</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+{% endblock %}

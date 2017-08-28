@@ -11,9 +11,43 @@
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
-        {% block header %}{% endblock %}
+        {% if is_login_page is not defined %}
+            {% include('header.html.twig') %}
+
+            <div class="container-fluid">
+                <div class="col-lg-4 col-md-4">
+                    <div class="well well-sm">
+                        <div class="row">
+                            <div class="col-md-7 m-top-5 text-center">
+                                <label for="language">
+                                    Choose a website language:
+                                </label>
+                            </div>
+                            <div class="col-md-5">
+                                <select id="language" class="form-control">
+                                    <option value="en">English</option>
+                                    <option value="ru">Russian</option>
+                                    <option value="cn">Chinese</option>
+                                    <option value="fr">Franch</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% block bodyLeft %}{% endblock %}
+                </div>
+                <div class="col-lg-8 col-md-8">
+                    {% include 'action_menu.html.twig' %}
+                    {% block bodyRight %}{% endblock %}
+                </div>
+            </div>
+        {% endif %}
+
         {% block body %}{% endblock %}
-        {% block footer %}{% endblock %}
+
+        {% if is_login_page is not defined %}
+            {% include('footer.html.twig') %}
+        {% endif %}
+
         {% block javascripts %}
             {% javascripts
             '@AppBundle/Resources/public/js/jquery-3.2.1.min.js'
