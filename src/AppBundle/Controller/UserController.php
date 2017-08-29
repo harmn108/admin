@@ -126,6 +126,7 @@ class UserController extends Controller
                 $userInfo['lastName'] = $user->getLastName();
                 $userInfo['email'] = $user->getEmail();
                 $userInfo['roleId'] = $user->getRoleId()->getId();
+                $userInfo['roleIdParent'] = $user->getRoleId()->getIdParent();
                 $userInfo['roleName'] = $user->getRoleId()->getName();
 
                 $userInfo['pages'] = ['Structure', 'Media', 'Article']; // from DB
