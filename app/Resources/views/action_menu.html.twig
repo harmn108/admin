@@ -5,7 +5,7 @@
     <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
             {% if userInfo['pages'] is defined %}
-                {% for page in test['pages'] %}
+                {% for page in userInfo['pages'] %}
                     <li><a href="#">{{ page }}</a></li>
                 {% endfor %}
             {% endif %}

@@ -1,3 +1,40 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Control Panel{% endblock %}
+{% block title %}Access{% endblock %}
+
+{% block bodyLeft %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">Panel Content</div>
+                <div class="panel-body">
+                    {% import _self as macros %}
+                    <ul class="">
+                        {{ macros.menu_links(rolesHierarchy) }}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block bodyRight %}
+    <div class="row">
+        <div class="col-lg-12">test2</div>
+    </div>
+{% endblock %}
+
+
+{% macro menu_links(rolesHierarchy) %}
+    {% import _self as macros %}
+    {% for role in rolesHierarchy %}
+        <li class="">
+            <a href="control/role/{{ role.id }}" class="menu_item">{{ role.name }}</a>
+            {% if role.children is defined %}
+                <ul>
+                    {{ macros.menu_links(role.children) }}
+                </ul>
+            {% endif %}
+        </li>
+    {% endfor %}
+{% endmacro %}

@@ -223,26 +223,12 @@ class UserController extends Controller
      * )
      */
     public function controlAction(){
-        $em = $this->getDoctrine()->getManager();
-        $repository = $em->getRepository(Role::class);
-
-        /**
-         * @var $user User
-         */
-        $roles = $repository->findAll();
-
-        $userInfo = $this->get('session')->remove($_COOKIE['X-TOKEN']);
-
-        $rolesArray = [];
-        foreach ($roles as $item){
-            $rolesArray[$item->getId()] = [];
-
-            $rolesArray[$item->getId()]['id'] = $item->getId();
-            $rolesArray[$item->getId()]['idParent'] = $item->getIdParent();
-            $rolesArray[$item->getId()]['name'] = $item->getName();
+        if(isset($_COOKIE['X-TOKEN']) && $_COOKIE['X-TOKEN']){
+            $rolesHierarchy = $this->getRolesHierarchy();
         }
-
-        $rolesHierarchy = $this->buildTree($rolesArray, $userInfo['roleIdParent']);
+        else{
+            return $this->redirect('login');
+        }
 
         return $this->render('user/control.html.twig', ['rolesHierarchy' => $rolesHierarchy]);
     }
@@ -261,7 +247,40 @@ class UserController extends Controller
      * )
      */
     public function accessAction(){
-        return $this->render('user/access.html.twig');
+
+        if(isset($_COOKIE['X-TOKEN']) && $_COOKIE['X-TOKEN']){
+            $rolesHierarchy = $this->getRolesHierarchy();
+        }
+        else{
+            return $this->redirect('login');
+        }
+
+        return $this->render('user/access.html.twig', ['rolesHierarchy' => $rolesHierarchy]);
+    }
+
+    public function getRolesHierarchy() {
+        $em = $this->getDoctrine()->getManager();
+        $repository = $em->getRepository(Role::class);
+
+        /**
+         * @var $user User
+         */
+        $roles = $repository->findAll();
+
+        $userInfo = $this->get('session')->get($_COOKIE['X-TOKEN']);
+
+        $rolesArray = [];
+        foreach ($roles as $item){
+            $rolesArray[$item->getId()] = [];
+
+            $rolesArray[$item->getId()]['id'] = $item->getId();
+            $rolesArray[$item->getId()]['idParent'] = $item->getIdParent();
+            $rolesArray[$item->getId()]['name'] = $item->getName();
+        }
+
+        $rolesHierarchy = $this->buildTree($rolesArray, $userInfo['roleIdParent']);
+
+        return $rolesHierarchy;
     }
 
     private function buildTree(array $elements, $parentId = 0) {
