@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Role;
 use AppBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -222,7 +223,28 @@ class UserController extends Controller
      * )
      */
     public function controlAction(){
-        return $this->render('user/control.html.twig');
+        $em = $this->getDoctrine()->getManager();
+        $repository = $em->getRepository(Role::class);
+
+        /**
+         * @var $user User
+         */
+        $roles = $repository->findAll();
+
+        $userInfo = $this->get('session')->remove($_COOKIE['X-TOKEN']);
+
+        $rolesArray = [];
+        foreach ($roles as $item){
+            $rolesArray[$item->getId()] = [];
+
+            $rolesArray[$item->getId()]['id'] = $item->getId();
+            $rolesArray[$item->getId()]['idParent'] = $item->getIdParent();
+            $rolesArray[$item->getId()]['name'] = $item->getName();
+        }
+
+        $rolesHierarchy = $this->buildTree($rolesArray, $userInfo['roleIdParent']);
+
+        return $this->render('user/control.html.twig', ['rolesHierarchy' => $rolesHierarchy]);
     }
 
     /**
@@ -240,5 +262,21 @@ class UserController extends Controller
      */
     public function accessAction(){
         return $this->render('user/access.html.twig');
+    }
+
+    private function buildTree(array $elements, $parentId = 0) {
+        $branch = array();
+
+        foreach ($elements as $element) {
+            if ($element['idParent'] == $parentId) {
+                $children = $this->buildTree($elements, $element['id']);
+                if ($children) {
+                    $element['children'] = $children;
+                }
+                $branch[] = $element;
+            }
+        }
+
+        return $branch;
     }
 }

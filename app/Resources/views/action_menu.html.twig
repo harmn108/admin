@@ -1,12 +1,15 @@
 {% set key = app.request.cookies.get('X-TOKEN') %}
-{% set test = app.session.get(key) %}
+{% set userInfo = app.session.get(key) %}
 
 <nav id="action_nav" class="navbar navbar-default">
     <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
-            {% for page in test['pages'] %}
-                <li><a href="#">{{ page }}</a></li>
-            {% endfor %}
+            {% if userInfo['pages'] is defined %}
+                {% for page in test['pages'] %}
+                    <li><a href="#">{{ page }}</a></li>
+                {% endfor %}
+            {% endif %}
+
         </ul>
     </div>
 </nav>

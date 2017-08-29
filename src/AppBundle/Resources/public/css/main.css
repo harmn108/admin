@@ -16,7 +16,7 @@ html, body {
     padding-top: 0;
 }
 
-a{
+a:not(.menu_item){
     color: white;
 }
 
