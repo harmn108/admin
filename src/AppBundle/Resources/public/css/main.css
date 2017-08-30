@@ -43,3 +43,7 @@ header a, footer a{
 .m-top-5{
     margin-top: 5px;
 }
+
+.pointer{
+    cursor: pointer;
+}
