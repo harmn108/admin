@@ -1,0 +1,14 @@
+{% if users is defined %}
+    {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                <a href="#">{{ user.firstName }}  {{ user.lastName }}</a>
+            </td>
+            <td>
+                <i class="fa fa-pencil-square-o pointer" aria-hidden="true" title="Edit User"></i>
+            </td>
+        </tr>
+    {% endfor %}
+{% endif %}

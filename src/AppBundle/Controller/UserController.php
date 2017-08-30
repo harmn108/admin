@@ -40,7 +40,7 @@ class UserController extends Controller
     public function indexAction(Request $request)
     {
         return $this->render('default/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
+            'base_dir' => realpath($this->getParameter('kernel.project_dir')) . DIRECTORY_SEPARATOR,
         ]);
     }
 
@@ -59,8 +59,8 @@ class UserController extends Controller
      */
     public function loginAction(Request $request)
     {
-        if($this->isLoggedInAction()){
-            return $this->redirect('admin');
+        if ($this->isLoggedInAction()) {
+            return $this->redirect($this->generateUrl('app_user_admin'));
         }
 
         $form = $this->createFormBuilder()
@@ -136,7 +136,7 @@ class UserController extends Controller
 
                 $session->set($token, $userInfo);
 
-                return $this->redirect('admin');
+                return $this->redirect($this->generateUrl('app_user_admin'));
             }
         }
 
@@ -145,7 +145,7 @@ class UserController extends Controller
             'errors' => $errors
         ));
     }
-    
+
     /**
      * @Route("/admin")
      * @Method({"GET"})
@@ -161,8 +161,8 @@ class UserController extends Controller
      */
     public function adminAction()
     {
-        if(!$this->isLoggedInAction()){
-            return $this->redirect('login');
+        if (!$this->isLoggedInAction()) {
+            return $this->redirect($this->generateUrl('app_user_login'));
         }
 
         return $this->render('user/admin.html.twig');
@@ -170,19 +170,19 @@ class UserController extends Controller
 
     private function isLoggedInAction()
     {
-       if(isset($_COOKIE['X-TOKEN']) && $_COOKIE['X-TOKEN']){
-           $em = $this->getDoctrine()->getManager();
-           $repository = $em->getRepository(User::class);
+        if (isset($_COOKIE['X-TOKEN']) && $_COOKIE['X-TOKEN']) {
+            $em = $this->getDoctrine()->getManager();
+            $repository = $em->getRepository(User::class);
 
-           /**
-            * @var $user User
-            */
-           $user = $repository->findOneBy(['token' => md5($_COOKIE['X-TOKEN'])]);
+            /**
+             * @var $user User
+             */
+            $user = $repository->findOneBy(['token' => md5($_COOKIE['X-TOKEN'])]);
 
-           if ($user !== null) {
-               return true;
-           }
-       }
+            if ($user !== null) {
+                return true;
+            }
+        }
 
         return false;
     }
@@ -200,7 +200,8 @@ class UserController extends Controller
      *   }
      * )
      */
-    public function logoutAction(){
+    public function logoutAction()
+    {
         if (isset($_COOKIE['X-TOKEN'])) {
             $this->get('session')->remove($_COOKIE['X-TOKEN']);
             unset($_COOKIE['X-TOKEN']);
@@ -212,7 +213,8 @@ class UserController extends Controller
     }
 
     /**
-     * @Route("/control")
+     * @Route("/control", name="app_control")
+     * @Route("/control/role/{id}", name="app_control_role")
      * @Method({"GET"})
      *
      * @ApiDoc(
@@ -224,15 +226,42 @@ class UserController extends Controller
      *   }
      * )
      */
-    public function controlAction(){
-        if($this->isLoggedInAction()){
+    public function controlAction(Request $request, $id = 0)
+    {
+        if ($this->isLoggedInAction()) {
             $rolesHierarchy = $this->getRolesHierarchy();
+        } else {
+            return $this->redirect($this->generateUrl('app_user_login'));
         }
-        else{
-            return $this->redirect('login');
+        $usersArray = [];
+        if($id) {
+            $em = $this->getDoctrine()->getManager();
+            $repository = $em->getRepository(User::class);
+
+            /**
+             * @var $user User
+             */
+            $users = $repository->findBy(['roleId' => $id]);
+            foreach ($users as $item) {
+                $usersArray[$item->getId()] = [];
+
+                $usersArray[$item->getId()]['id'] = $item->getId();
+                $usersArray[$item->getId()]['firstName'] = $item->getFirstName();
+                $usersArray[$item->getId()]['lastName'] = $item->getLastName();
+                $usersArray[$item->getId()]['email'] = $item->getEmail();
+                $usersArray[$item->getId()]['createdBy'] = $item->getCreatedBy()->getId();
+                $usersArray[$item->getId()]['updateBy'] = $item->getUpdatedBy()->getId();
+                $usersArray[$item->getId()]['createdAt'] = $item->getCreatedAt();
+                $usersArray[$item->getId()]['updatedAt'] = $item->getUpdatedAt();
+            }
         }
 
-        return $this->render('user/control.html.twig', ['rolesHierarchy' => $rolesHierarchy]);
+        return $this->render('user/control.html.twig', [
+            'rolesHierarchy' => $rolesHierarchy,
+            'users' => $usersArray,
+            'roleId' => $id
+        ]);
+
     }
 
     /**
@@ -248,13 +277,13 @@ class UserController extends Controller
      *   }
      * )
      */
-    public function accessAction(){
+    public function accessAction()
+    {
 
-        if($this->isLoggedInAction()){
+        if ($this->isLoggedInAction()) {
             $rolesHierarchy = $this->getRolesHierarchy();
-        }
-        else{
-            return $this->redirect('login');
+        } else {
+            return $this->redirect($this->generateUrl('app_user_login'));
         }
 
         return $this->render('user/access.html.twig', ['rolesHierarchy' => $rolesHierarchy]);
@@ -329,6 +358,7 @@ class UserController extends Controller
 
     /**
      * @Route("/get_user_by_id")
+     * @Route("/control/role/get_user_by_id")
      * @Method({"POST"})
      *
      * @ApiDoc(
@@ -340,15 +370,16 @@ class UserController extends Controller
      *   }
      * )
      */
-    public function getUserrByIdAction(Request $request){
-        if(!$this->isLoggedInAction()) {
-            return $this->redirect('login');
+    public function getUserrByIdAction(Request $request)
+    {
+        if (!$this->isLoggedInAction()) {
+            return $this->redirect($this->generateUrl('app_user_login'));
         }
         $data = $request->request->all();
 
         $errors = [];
-        if (!isset($data['id'])){
-           $errors[] = 'Invalid Request';
+        if (!isset($data['id'])) {
+            $errors[] = 'Invalid Request';
         }
         $id = $data['id'];
         $em = $this->getDoctrine()->getManager();
@@ -379,26 +410,27 @@ class UserController extends Controller
     }
 
     /**
- * @Route("/update_user")
- * @Method({"POST"})
- *
- * @ApiDoc(
- *   resource=true,
- *   description="This REST is ",
- *   statusCodes={
- *     200="Success",
- *     404="Not found"
- *   }
- * )
- */
-    public function updateUserAction(Request $request){
-        if(!$this->isLoggedInAction()) {
-            return $this->redirect('login');
+     * @Route("/update_user")
+     * @Method({"POST"})
+     *
+     * @ApiDoc(
+     *   resource=true,
+     *   description="This REST is ",
+     *   statusCodes={
+     *     200="Success",
+     *     404="Not found"
+     *   }
+     * )
+     */
+    public function updateUserAction(Request $request)
+    {
+        if (!$this->isLoggedInAction()) {
+            return $this->redirect($this->generateUrl('app_user_login'));
         }
         $data = $request->request->all();
 
         $errors = [];
-        if (!isset($data['id'])){
+        if (!isset($data['id'])) {
             $errors[] = 'Invalid Request';
         }
         $id = $data['id'];
@@ -424,7 +456,7 @@ class UserController extends Controller
                 $user->setEmail($data['email']);
             }
             if(isset($data['password']) && $data['password']){
-                $user->setPassword($data['password']);
+                $user->setPassword(md5($data['password']));
             }
 
             $em->persist($user);
@@ -434,6 +466,70 @@ class UserController extends Controller
         }
 
         return new JsonResponse($errors, 400);
+    }
+
+    /**
+     * @Route("/add_user")
+     * @Route("/control/role/add_user")
+     * @Method({"POST"})
+     *
+     * @ApiDoc(
+     *   resource=true,
+     *   description="This REST is ",
+     *   statusCodes={
+     *     200="Success",
+     *     404="Not found"
+     *   }
+     * )
+     */
+    public function addUserAction(Request $request)
+    {
+        if (!$this->isLoggedInAction()) {
+            return $this->redirect($this->generateUrl('app_user_login'));
+        }
+        $data = $request->request->all();
+        $errors = [];
+        if (!isset($data['role_id'])) {
+            $errors[] = 'Invalid Request';
+        }
+
+        $roleId = $data['role_id'];
+        $em = $this->getDoctrine()->getManager();
+        $role = $em->getRepository(Role::class)->find($roleId);
+
+        $user = new User();
+
+        $user->setRoleId($role);
+
+        if(isset($data['firstName']) && $data['firstName']){
+            $user->setFirstName($data['firstName']);
+        }
+        if(isset($data['lastName']) && $data['lastName']){
+            $user->setLastName($data['lastName']);
+        }
+        if(isset($data['email']) && $data['email']){
+            $user->setEmail($data['email']);
+        }
+        if(isset($data['password']) && $data['password']){
+            $user->setPassword(md5($data['password']));
+        }
+
+        $userInfo = $this->get('session')->get($_COOKIE['X-TOKEN']);
+
+        $currentUser = $em->getRepository(User::class)->find($userInfo['id']);
+
+        $user->setCreatedBy($currentUser);
+        $user->setUpdatedBy($currentUser);
+
+        $em->persist($user);
+        $em->flush();
+
+        $repository = $em->getRepository(User::class);
+        $users = $repository->findBy(['roleId' => $roleId]);
+
+        $usersList = $this->renderView('user/user_list.html.twig', ['users' => $users]);
+
+        return new JsonResponse(['users' => $usersList], Response::HTTP_OK);
     }
 
     /**

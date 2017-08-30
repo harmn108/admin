@@ -5,9 +5,11 @@ function Control() {
 Control.prototype.Init = function () {
     var obj = this;
 
-    this.base_url = ''
+    this.base_url = document.location.origin;
     obj.menu_item = $("a.control_menu_item");
     obj.update_user_modal = $("#control_update_user");
+    obj.addUM = $("#control_add_user");
+    obj.add_user_btn = $("#add_user_btn");
 
     obj.update_um_f_name = obj.update_user_modal.find('input.f_name');
     obj.update_um_l_name = obj.update_user_modal.find('input.l_name');
@@ -17,6 +19,8 @@ Control.prototype.Init = function () {
     obj.update_um_cpassword = obj.update_user_modal.find('input.cpassword');
 
     obj.update_um_save = obj.update_user_modal.find('button.save');
+
+    obj.userListTable = $("#user_list_table")
 
     obj.menu_item.on('click', function(event){
         event.preventDefault();
@@ -38,6 +42,27 @@ Control.prototype.Init = function () {
 
         if(result){
             obj.update_user_modal.modal('hide');
+        }
+    });
+
+    obj.add_user_btn.on('click', function(event){
+        event.preventDefault();
+        var roleId = $(this).data('roleid');
+        $("#add_um_form")[0].reset();
+
+        obj.addUM.find('input.roleId').val(roleId);
+        obj.addUM.modal('show');
+    });
+
+    $('#add_um_form').validator().on('submit', function (e) {
+        e.preventDefault();
+        var formData = $(this).serialize();
+
+        var result = obj.addUser(formData);
+
+        if(result){
+            obj.userListTable.find('tbody').html(result.users);
+            obj.addUM.modal('hide');
         }
     });
 };
@@ -97,6 +122,23 @@ Control.prototype.updateUser = function (data) {
     $.ajax({
         method: "POST",
         url: 'update_user',
+        dataType: "JSON",
+        async: false,
+        data: data,
+        success: function (data) {
+            result = data;
+        }
+    });
+
+    return result;
+};
+
+Control.prototype.addUser = function (data) {
+    var result;
+
+    $.ajax({
+        method: "POST",
+        url: 'add_user',
         dataType: "JSON",
         async: false,
         data: data,

@@ -24,59 +24,134 @@
 {% block bodyRight %}
     <div class="row">
         <div class="col-lg-12">
-            <div class="modal fade" tabindex="-1" role="dialog" id="control_update_user">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <form data-toggle="validator" role="form" id="update_um_form">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                            aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title">Update user</h4>
-                            </div>
-                            <div class="modal-body">
-                                <input type="hidden" name="id" value="" class="userid">
+            {% if users is defined and users %}
+                <button type="button" class="btn btn-primary m-bottom-10 pull-right" data-toggle="modal" id="add_user_btn" data-roleId="{{ roleId }}">
+                    Add User
+                </button>
 
+                <table id="user_list_table" class="table table-striped table-bordered table-hover table-condensed"
+                       data-click-to-select="true">
+                    <thead>
+                        <tr class="success" >
+                            <th>ID</th>
+                            <th>Email</th>
+                            <th>Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% include '/user/user_list.html.twig' with {'users': users} %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="control_update_user">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form data-toggle="validator" role="form" id="update_um_form">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Update user</h4>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="id" value="" class="userid">
+
+                            <div class="form-group">
+                                <label for="update_um_f_name" class="control-label">First name:</label>
+                                <input id="update_um_f_name" name="firstName" type="text" value="" class="form-control f_name" required/>
+                                <div class="help-block with-errors"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="update_um_l_name">Last name:</label>
+                                <input id="update_um_l_name" name="lastName" type="text" value="" class="form-control l_name" required/>
+                                <div class="help-block with-errors"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="update_um_email" class="control-label">Email</label>
+                                <input name="email" type="email" class="form-control email" id="update_um_email" placeholder="Email" data-error="Bruh, that email address is invalid" required>
+                                <div class="help-block with-errors"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="update_um_password" class="control-label">Password</label>
                                 <div class="form-group">
-                                    <label for="update_um_f_name" class="control-label">First name:</label>
-                                    <input id="update_um_f_name" name="firstName" type="text" value="" class="form-control f_name" required/>
+                                    <input name="password" type="password" data-minlength="6" class="form-control password" id="update_um_password">
+                                    <div class="help-block">Minimum of 6 characters</div>
+                                </div>
+                                <label for="update_um_cpassword" class="control-label">Confirm Password</label>
+                                <div class="form-group">
+                                    <input id="update_um_cpassword" name="cpassword" type="password" class="form-control" id="inputPasswordConfirm" data-match="#update_um_password" data-match-error="Whoops, these don't match">
                                     <div class="help-block with-errors"></div>
                                 </div>
+                            </div>
 
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary save">Save changes</button>
+                        </div>
+                    </form>
+
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div>
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="control_add_user">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form data-toggle="validator" role="form" id="add_um_form">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Add user</h4>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="role_id" value="" class="roleId">
+
+                            <div class="form-group">
+                                <label for="add_um_f_name" class="control-label">First name:</label>
+                                <input id="add_um_f_name" name="firstName" type="text" value="" class="form-control f_name" required/>
+                                <div class="help-block with-errors"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="add_um_l_name">Last name:</label>
+                                <input id="add_um_l_name" name="lastName" type="text" value="" class="form-control l_name" required/>
+                                <div class="help-block with-errors"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="add_um_email" class="control-label">Email</label>
+                                <input name="email" type="email" class="form-control email" id="add_um_email" placeholder="Email" data-error="Bruh, that email address is invalid" required>
+                                <div class="help-block with-errors"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="add_um_password" class="control-label">Password</label>
                                 <div class="form-group">
-                                    <label for="update_um_l_name">Last name:</label>
-                                    <input id="update_um_l_name" name="lastName" type="text" value="" class="form-control l_name" required/>
+                                    <input name="password" type="password" data-minlength="6" class="form-control password" id="add_um_password" required>
+                                    <div class="help-block">Minimum of 6 characters</div>
+                                </div>
+                                <label for="add_um_cpassword" class="control-label">Confirm Password</label>
+                                <div class="form-group">
+                                    <input id="add_um_cpassword" name="cpassword" type="password" class="form-control" id="inputPasswordConfirm" data-match="#add_um_password" data-match-error="Whoops, these don't match" required>
                                     <div class="help-block with-errors"></div>
                                 </div>
-
-                                <div class="form-group">
-                                    <label for="update_um_email" class="control-label">Email</label>
-                                    <input name="email" type="email" class="form-control email" id="update_um_email" placeholder="Email" data-error="Bruh, that email address is invalid" required>
-                                    <div class="help-block with-errors"></div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="update_um_password" class="control-label">Password</label>
-                                    <div class="form-group">
-                                        <input name="password" type="password" data-minlength="6" class="form-control password" id="update_um_password">
-                                        <div class="help-block">Minimum of 6 characters</div>
-                                    </div>
-                                    <label for="update_um_cpassword" class="control-label">Confirm Password</label>
-                                    <div class="form-group">
-                                        <input id="update_um_cpassword" name="cpassword" type="password" class="form-control" id="inputPasswordConfirm" data-match="#update_um_password" data-match-error="Whoops, these don't match">
-                                        <div class="help-block with-errors"></div>
-                                    </div>
-                                </div>
-
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary save">Save changes</button>
-                            </div>
-                        </form>
 
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal-dialog -->
-            </div><!-- /.modal -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary save">Save changes</button>
+                        </div>
+                    </form>
+
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
         </div>
     </div>
 {% endblock %}
@@ -87,9 +162,9 @@
     {% for role in rolesHierarchy %}
         <li>
             {% if userInfo.roleId is defined and role.id == userInfo.roleId %}
-                <a href="#" class="control_menu_item" data-userId="{{ userInfo.id }}">{{ role.name }}</a>
+                <a href="{{ path('app_control') }}" class="control_menu_item" data-userId="{{ userInfo.id }}">{{ role.name }}</a>
             {% else %}
-                <a href="control/role/{{ role.id }}">{{ role.name }}</a>
+                <a href="{{ path('app_control_role', parameters = {id:role.id}) }}">{{ role.name }}</a>
             {% endif %}
             {% if role.children is defined %}
                 <ul>
