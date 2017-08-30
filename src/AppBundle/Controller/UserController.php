@@ -123,6 +123,7 @@ class UserController extends Controller
                 $session = new Session();
 
                 $userInfo = [];
+                $userInfo['id'] = $user->getId();
                 $userInfo['firstName'] = $user->getFirstName();
                 $userInfo['lastName'] = $user->getLastName();
                 $userInfo['email'] = $user->getEmail();
@@ -223,7 +224,7 @@ class UserController extends Controller
      * )
      */
     public function controlAction(){
-        if(isset($_COOKIE['X-TOKEN']) && $_COOKIE['X-TOKEN']){
+        if($this->isLoggedInAction()){
             $rolesHierarchy = $this->getRolesHierarchy();
         }
         else{
@@ -248,7 +249,7 @@ class UserController extends Controller
      */
     public function accessAction(){
 
-        if(isset($_COOKIE['X-TOKEN']) && $_COOKIE['X-TOKEN']){
+        if($this->isLoggedInAction()){
             $rolesHierarchy = $this->getRolesHierarchy();
         }
         else{
@@ -297,5 +298,114 @@ class UserController extends Controller
         }
 
         return $branch;
+    }
+
+    /**
+     * @Route("/get_user_by_id")
+     * @Method({"POST"})
+     *
+     * @ApiDoc(
+     *   resource=true,
+     *   description="This REST is ",
+     *   statusCodes={
+     *     200="Success",
+     *     404="Not found"
+     *   }
+     * )
+     */
+    public function getUserrByIdAction(Request $request){
+        if(!$this->isLoggedInAction()) {
+            return $this->redirect('login');
+        }
+        $data = $request->request->all();
+
+        $errors = [];
+        if (!isset($data['id'])){
+           $errors[] = 'Invalid Request';
+        }
+        $id = $data['id'];
+        $em = $this->getDoctrine()->getManager();
+        $repository = $em->getRepository(User::class);
+
+        /**
+         * @var $user User
+         */
+        $user = $repository->find($id);
+
+        if ($user === null) {
+            $errors[] = 'User Not Found';
+        }
+        else{
+            $userInfo = [];
+            $userInfo['id'] = $user->getId();
+            $userInfo['firstName'] = $user->getFirstName();
+            $userInfo['lastName'] = $user->getLastName();
+            $userInfo['email'] = $user->getEmail();
+            $userInfo['roleId'] = $user->getRoleId()->getId();
+            $userInfo['roleIdParent'] = $user->getRoleId()->getIdParent();
+            $userInfo['roleName'] = $user->getRoleId()->getName();
+
+            return new JsonResponse($userInfo);
+        }
+
+        return new JsonResponse($errors, 400);
+    }
+
+    /**
+     * @Route("/update_user")
+     * @Method({"POST"})
+     *
+     * @ApiDoc(
+     *   resource=true,
+     *   description="This REST is ",
+     *   statusCodes={
+     *     200="Success",
+     *     404="Not found"
+     *   }
+     * )
+     */
+    public function updateUserAction(Request $request){
+        if(!$this->isLoggedInAction()) {
+            return $this->redirect('login');
+        }
+        $data = $request->request->all();
+
+        $errors = [];
+        if (!isset($data['id'])){
+           $errors[] = 'Invalid Request';
+        }
+        $id = $data['id'];
+        $em = $this->getDoctrine()->getManager();
+        $repository = $em->getRepository(User::class);
+
+        /**
+         * @var $user User
+         */
+        $user = $repository->find($id);
+
+        if ($user === null) {
+            $errors[] = 'User Not Found';
+        }
+        else{
+            if(isset($data['firstName']) && $data['firstName']){
+                $user->setFirstName($data['firstName']);
+            }
+            if(isset($data['lastName']) && $data['lastName']){
+                $user->setLastName($data['lastName']);
+            }
+            if(isset($data['email']) && $data['email']){
+                $user->setEmail($data['email']);
+            }
+            if(isset($data['password']) && $data['password']){
+                $user->setPassword($data['password']);
+            }
+
+            $em->persist($user);
+            $em->flush();
+
+            return new JsonResponse($user->getId());
+        }
+
+        return new JsonResponse($errors, 400);
     }
 }
