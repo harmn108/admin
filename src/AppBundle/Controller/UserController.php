@@ -67,13 +67,13 @@ class UserController extends Controller
             ->setMethod('POST')
             ->add('email', EmailType::class, [
                 'attr'   =>  [
-                    'class'   => 'form-control m-bottom-10', 
+                    'class'   => 'form-control m-bottom-10',
                     'required' => 'required',
                 ]
             ])
             ->add('password', PasswordType::class, [
                 'attr'   =>  [
-                    'class'   => 'form-control m-bottom-10', 
+                    'class'   => 'form-control m-bottom-10',
                     'required' => 'required'
                 ]
             ])
@@ -370,7 +370,8 @@ class UserController extends Controller
      *   }
      * )
      */
-    public function getUserrByIdAction(Request $request)
+
+    public function getUserByIdAction(Request $request)
     {
         if (!$this->isLoggedInAction()) {
             return $this->redirect($this->generateUrl('app_user_login'));
@@ -410,6 +411,51 @@ class UserController extends Controller
     }
 
     /**
+     * @Route("/get_page_by_id")
+     * @Method({"POST"})
+     *
+     * @ApiDoc(
+     *   resource=true,
+     *   description="This REST is ",
+     *   statusCodes={
+     *     200="Success",
+     *     404="Not found"
+     *   }
+     * )
+     */
+    public function getPageByIdAction(Request $request){
+        if (!$this->isLoggedInAction()) {
+            return $this->redirect($this->generateUrl('app_user_login'));
+        }
+
+        $data = $request->request->all();
+
+        $errors = [];
+        if (!isset($data['id'])){
+            $errors[] = 'Invalid Request';
+        }
+        $id = $data['id'];
+        $em = $this->getDoctrine()->getManager();
+        $repository = $em->getRepository(Page::class);
+
+        $page = $repository->find($id);
+
+        if ($page === null) {
+            $errors[] = 'Page Not Found';
+        }
+        else{
+            $pageInfo = [];
+            $pageInfo['id'] = $page->getId();
+            $pageInfo['name'] = $page->getName();
+            $pageInfo['route'] = $page->getRoute();
+
+            return new JsonResponse($pageInfo);
+        }
+
+        return new JsonResponse($errors, 400);
+    }
+
+    /**
      * @Route("/update_user")
      * @Method({"POST"})
      *
@@ -422,10 +468,9 @@ class UserController extends Controller
      *   }
      * )
      */
-    public function updateUserAction(Request $request)
-    {
-        if (!$this->isLoggedInAction()) {
-            return $this->redirect($this->generateUrl('app_user_login'));
+    public function updateUserAction(Request $request){
+        if(!$this->isLoggedInAction()) {
+            return $this->redirect('login');
         }
         $data = $request->request->all();
 
@@ -482,12 +527,14 @@ class UserController extends Controller
      *   }
      * )
      */
+
     public function addUserAction(Request $request)
     {
         if (!$this->isLoggedInAction()) {
             return $this->redirect($this->generateUrl('app_user_login'));
         }
         $data = $request->request->all();
+
         $errors = [];
         if (!isset($data['role_id'])) {
             $errors[] = 'Invalid Request';
@@ -579,5 +626,54 @@ class UserController extends Controller
         $pagesList = $this->renderView('user/pages_list.html.twig', ['pages' => $pages]);
 
         return new JsonResponse(['pages' => $pagesList], Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/update_page")
+     * @Method({"POST"})
+     *
+     * @ApiDoc(
+     *   resource=true,
+     *   description="This REST is ",
+     *   statusCodes={
+     *     200="Success",
+     *     404="Not found"
+     *   }
+     * )
+     */
+    public function updatePageAction(Request $request){
+        if (!$this->isLoggedInAction()) {
+            return $this->redirect($this->generateUrl('app_user_login'));
+        }
+        $data = $request->request->all();
+
+        $errors = [];
+        if (!isset($data['id'])){
+            $errors[] = 'Invalid Request';
+        }
+        $id = $data['id'];
+        $em = $this->getDoctrine()->getManager();
+        $repository = $em->getRepository(Page::class);
+
+        $page = $repository->find($id);
+
+        if ($page === null) {
+            $errors[] = 'Page Not Found';
+        }
+        else{
+            if(isset($data['name']) && $data['name']){
+                $page->setName($data['name']);
+            }
+            if(isset($data['route']) && $data['route']){
+                $page->setRoute($data['route']);
+            }
+
+            $em->persist($page);
+            $em->flush();
+
+            return new JsonResponse($page->getId());
+        }
+
+        return new JsonResponse($errors, 400);
     }
 }

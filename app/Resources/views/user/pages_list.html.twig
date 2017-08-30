@@ -1,12 +1,12 @@
 {% if pages is defined %}
     {% for page in pages %}
-        <tr class="text-center">
+        <tr class="text-center" data-id="{{ page.id }}">
             <td>{{ page.id }}</td>
             <td>
-                <a href="{{ page.route }}">{{ page.name }}</a>
+                <a  class="page_route" href="{{ page.route }}">{{ page.name }}</a>
             </td>
             <td>
-                <i class="fa fa-pencil-square-o pointer" aria-hidden="true" title="Edit Page"></i>
+                <i class="fa fa-pencil-square-o pointer update_page" aria-hidden="true" title="Edit Page"></i>
             </td>
         </tr>
     {% endfor %}
