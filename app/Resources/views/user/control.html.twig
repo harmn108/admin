@@ -22,32 +22,19 @@
 {% endblock %}
 
 {% block bodyRight %}
-    <form data-toggle="validator" role="form" id="update_um_form">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="modal fade" tabindex="-1" role="dialog" id="control_update_user">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="modal fade" tabindex="-1" role="dialog" id="control_update_user">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <form data-toggle="validator" role="form" id="update_um_form">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                             aria-hidden="true">&times;</span></button>
                                 <h4 class="modal-title">Update user</h4>
                             </div>
-
                             <div class="modal-body">
                                 <input type="hidden" name="id" value="" class="userid">
-
-                                <div class="form-group">
-                                    <label for="update_um_password" class="control-label">Password</label>
-                                    <div class="form-group">
-                                        <input name="password" type="password" data-minlength="6" class="form-control password" id="update_um_password" placeholder="Password">
-                                        <div class="help-block">Minimum of 6 characters</div>
-                                    </div>
-                                    <div class="form-group">
-                                        <input name="cpassword" type="password" class="form-control" id="inputPasswordConfirm" data-match="#update_um_password" data-match-error="Whoops, these don't match" placeholder="Confirm">
-                                        <div class="help-block with-errors"></div>
-                                    </div>
-                                </div>
 
                                 <div class="form-group">
                                     <label for="update_um_f_name" class="control-label">First name:</label>
@@ -66,19 +53,32 @@
                                     <input name="email" type="email" class="form-control email" id="update_um_email" placeholder="Email" data-error="Bruh, that email address is invalid" required>
                                     <div class="help-block with-errors"></div>
                                 </div>
-                            </div>
 
+                                <div class="form-group">
+                                    <label for="update_um_password" class="control-label">Password</label>
+                                    <div class="form-group">
+                                        <input name="password" type="password" data-minlength="6" class="form-control password" id="update_um_password">
+                                        <div class="help-block">Minimum of 6 characters</div>
+                                    </div>
+                                    <label for="update_um_cpassword" class="control-label">Confirm Password</label>
+                                    <div class="form-group">
+                                        <input id="update_um_cpassword" name="cpassword" type="password" class="form-control" id="inputPasswordConfirm" data-match="#update_um_password" data-match-error="Whoops, these don't match">
+                                        <div class="help-block with-errors"></div>
+                                    </div>
+                                </div>
+
+                            </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                 <button type="submit" class="btn btn-primary save">Save changes</button>
                             </div>
+                        </form>
 
-                        </div><!-- /.modal-content -->
-                    </div><!-- /.modal-dialog -->
-                </div><!-- /.modal -->
-            </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
         </div>
-    </form>
+    </div>
 {% endblock %}
 
 
