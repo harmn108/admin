@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Page;
 use AppBundle\Entity\Role;
 use AppBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -259,6 +260,35 @@ class UserController extends Controller
         return $this->render('user/access.html.twig', ['rolesHierarchy' => $rolesHierarchy]);
     }
 
+    /**
+     * @Route("/pages")
+     * @Method({"GET"})
+     *
+     * @ApiDoc(
+     *   resource=true,
+     *   description="This REST is ",
+     *   statusCodes={
+     *     200="Success",
+     *     404="Not found"
+     *   }
+     * )
+     */
+    public function pagesAction(){
+        if(!$this->isLoggedInAction()){
+            return $this->redirect('login');
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $repository = $em->getRepository(Page::class);
+
+        /**
+         * @var $user User
+         */
+        $pages = $repository->findAll();
+
+        return $this->render('user/pages.html.twig', ['pages' => $pages]);
+    }
+
     public function getRolesHierarchy() {
         $em = $this->getDoctrine()->getManager();
         $repository = $em->getRepository(Role::class);
@@ -279,17 +309,17 @@ class UserController extends Controller
             $rolesArray[$item->getId()]['name'] = $item->getName();
         }
 
-        $rolesHierarchy = $this->buildTree($rolesArray, $userInfo['roleIdParent']);
+        $rolesHierarchy = $this->buildRolesTree($rolesArray, $userInfo['roleIdParent']);
 
         return $rolesHierarchy;
     }
 
-    private function buildTree(array $elements, $parentId = 0) {
+    private function buildRolesTree(array $elements, $parentId = 0) {
         $branch = array();
 
         foreach ($elements as $element) {
             if ($element['idParent'] == $parentId) {
-                $children = $this->buildTree($elements, $element['id']);
+                $children = $this->buildRolesTree($elements, $element['id']);
                 if ($children) {
                     $element['children'] = $children;
                 }

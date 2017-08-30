@@ -16,7 +16,7 @@ html, body {
     padding-top: 0;
 }
 
-header a{
+header a, footer a{
     color: white;
 }
 
@@ -30,6 +30,10 @@ header a{
 
 .m-bottom-10{
     margin-bottom: 10px;
+}
+
+.m-bottom-20{
+    margin-bottom: 20px;
 }
 
 .m-top-20{

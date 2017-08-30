@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pages{% endblock %}
+
+
+{% block bodyRight %}
+    <div class="row">
+        <div class="col-lg-12">
+            <button type="button" class="btn btn-primary m-bottom-10 pull-right" data-toggle="modal" data-target="#addPageModal">
+                Add Page
+            </button>
+
+            <table class="table table-striped table-bordered table-hover table-condensed"
+                    data-click-to-select="true">
+                <thead>
+                    <tr class="success" >
+                        <th>ID</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if pages is defined %}
+                        {% for page in pages %}
+                            <tr>
+                                <td>{{ page.id }}</td>
+                                <td>
+                                    <a href="{{ page.route }}">{{ page.name }}</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="addPageModal" tabindex="-1" role="dialog" aria-labelledby="addPageModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addPageModalLabel">Add New Page</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="m-bottom-20">
+                            <label class="control-label"
+                                   for="pageName" >Name</label>
+                            <input type="text" class="form-control"
+                                   id="pageName"/>
+                        </div>
+                        <div>
+                            <label class="control-label"
+                                   for="pageRoute" >Route</label>
+                            <input type="text" class="form-control"
+                                   id="pageRoute"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

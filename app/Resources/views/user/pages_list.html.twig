@@ -1,0 +1,10 @@
+{% if pages is defined %}
+    {% for page in pages %}
+        <tr>
+            <td>{{ page.id }}</td>
+            <td>
+                <a href="{{ page.route }}">{{ page.name }}</a>
+            </td>
+        </tr>
+    {% endfor %}
+{% endif %}
