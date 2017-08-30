@@ -281,9 +281,6 @@ class UserController extends Controller
         $em = $this->getDoctrine()->getManager();
         $repository = $em->getRepository(Page::class);
 
-        /**
-         * @var $user User
-         */
         $pages = $repository->findAll();
 
         return $this->render('user/pages.html.twig', ['pages' => $pages]);
@@ -382,18 +379,18 @@ class UserController extends Controller
     }
 
     /**
-     * @Route("/update_user")
-     * @Method({"POST"})
-     *
-     * @ApiDoc(
-     *   resource=true,
-     *   description="This REST is ",
-     *   statusCodes={
-     *     200="Success",
-     *     404="Not found"
-     *   }
-     * )
-     */
+ * @Route("/update_user")
+ * @Method({"POST"})
+ *
+ * @ApiDoc(
+ *   resource=true,
+ *   description="This REST is ",
+ *   statusCodes={
+ *     200="Success",
+ *     404="Not found"
+ *   }
+ * )
+ */
     public function updateUserAction(Request $request){
         if(!$this->isLoggedInAction()) {
             return $this->redirect('login');
@@ -402,7 +399,7 @@ class UserController extends Controller
 
         $errors = [];
         if (!isset($data['id'])){
-           $errors[] = 'Invalid Request';
+            $errors[] = 'Invalid Request';
         }
         $id = $data['id'];
         $em = $this->getDoctrine()->getManager();
@@ -437,5 +434,54 @@ class UserController extends Controller
         }
 
         return new JsonResponse($errors, 400);
+    }
+
+    /**
+     * @Route("/add_page")
+     * @Method({"POST"})
+     *
+     * @ApiDoc(
+     *   resource=true,
+     *   description="This REST is ",
+     *   statusCodes={
+     *     200="Success",
+     *     404="Not found"
+     *   }
+     * )
+     */
+    public function addPageAction(Request $request){
+        if(!$this->isLoggedInAction()) {
+            return $this->redirect('login');
+        }
+
+        $data = $request->request->all();
+
+        if((!isset($data['name']) || $data['name'] == '') || (!isset($data['route']) || $data['route'] == '')){
+            return new JsonResponse(Response::$statusTexts[Response::HTTP_BAD_REQUEST], Response::HTTP_BAD_REQUEST);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $repository = $em->getRepository(User::class);
+
+        $page = new Page();
+        $page->setName($data['name']);
+        $page->setRoute($data['route']);
+
+        $userInfo = $this->get('session')->get($_COOKIE['X-TOKEN']);
+
+        $user = $repository->find($userInfo['id']);
+
+        $page->setCreatedBy($user);
+        $page->setUpdatedBy($user);
+
+        $em->persist($page);
+        $em->flush();
+
+        $repository = $em->getRepository(Page::class);
+        $pages = $repository->findAll();
+
+        $pagesList = $this->renderView('user/pages_list.html.twig', ['pages' => $pages]);
+
+        return new JsonResponse(['pages' => $pagesList], Response::HTTP_OK);
     }
 }

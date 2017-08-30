@@ -1,9 +1,12 @@
 {% if pages is defined %}
     {% for page in pages %}
-        <tr>
+        <tr class="text-center">
             <td>{{ page.id }}</td>
             <td>
                 <a href="{{ page.route }}">{{ page.name }}</a>
+            </td>
+            <td>
+                <i class="fa fa-pencil-square-o pointer" aria-hidden="true" title="Edit Page"></i>
             </td>
         </tr>
     {% endfor %}
