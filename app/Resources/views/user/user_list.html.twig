@@ -1,13 +1,13 @@
 {% if users is defined %}
     {% for user in users %}
-        <tr>
+        <tr data-id="{{ user.id }}">
             <td>{{ user.id }}</td>
             <td>{{ user.email }}</td>
             <td>
                 <a href="#">{{ user.firstName }}  {{ user.lastName }}</a>
             </td>
             <td>
-                <i class="fa fa-pencil-square-o pointer" aria-hidden="true" title="Edit User"></i>
+                <i class="fa fa-pencil-square-o pointer update_user" aria-hidden="true" title="Edit User"></i>
             </td>
         </tr>
     {% endfor %}

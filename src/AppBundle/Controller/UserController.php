@@ -457,6 +457,7 @@ class UserController extends Controller
 
     /**
      * @Route("/update_user")
+     * @Route("/control/role/update_user")
      * @Method({"POST"})
      *
      * @ApiDoc(
@@ -507,7 +508,11 @@ class UserController extends Controller
             $em->persist($user);
             $em->flush();
 
-            return new JsonResponse($user->getId());
+            $users = $repository->findBy(['roleId' => $user->getRoleId()->getId()]);
+
+            $usersList = $this->renderView('user/user_list.html.twig', ['users' => $users]);
+
+            return new JsonResponse(['users' => $usersList]);
         }
 
         return new JsonResponse($errors, 400);
