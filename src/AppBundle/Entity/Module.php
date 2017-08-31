@@ -8,11 +8,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Role
  *
- * @ORM\Table(name="page")
+ * @ORM\Table(name="module")
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks
  */
-class Page
+class Module
 {
     /**
      * @ORM\Column(name="id", type="integer")
@@ -78,7 +78,7 @@ class Page
      *
      * @param string $name
      *
-     * @return Page
+     * @return Module
      */
     public function setName($name)
     {
@@ -102,7 +102,7 @@ class Page
      *
      * @param string $route
      *
-     * @return Page
+     * @return Module
      */
     public function setRoute($route)
     {
@@ -126,7 +126,7 @@ class Page
      *
      * @param \DateTime $createdAt
      *
-     * @return Page
+     * @return Module
      */
     public function setCreatedAt($createdAt)
     {
@@ -150,7 +150,7 @@ class Page
      *
      * @param \DateTime $updatedAt
      *
-     * @return Page
+     * @return Module
      */
     public function setUpdatedAt($updatedAt)
     {
@@ -174,7 +174,7 @@ class Page
      *
      * @param \AppBundle\Entity\User $createdBy
      *
-     * @return Page
+     * @return Module
      */
     public function setCreatedBy(\AppBundle\Entity\User $createdBy = null)
     {
@@ -198,7 +198,7 @@ class Page
      *
      * @param \AppBundle\Entity\User $updatedBy
      *
-     * @return Page
+     * @return Module
      */
     public function setUpdatedBy(\AppBundle\Entity\User $updatedBy = null)
     {

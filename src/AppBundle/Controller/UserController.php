@@ -2,7 +2,7 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\Page;
+use AppBundle\Entity\Module;
 use AppBundle\Entity\Role;
 use AppBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -290,7 +290,7 @@ class UserController extends Controller
     }
 
     /**
-     * @Route("/pages")
+     * @Route("/modules")
      * @Method({"GET"})
      *
      * @ApiDoc(
@@ -302,17 +302,17 @@ class UserController extends Controller
      *   }
      * )
      */
-    public function pagesAction(){
+    public function modulesAction(){
         if(!$this->isLoggedInAction()){
             return $this->redirect('login');
         }
 
         $em = $this->getDoctrine()->getManager();
-        $repository = $em->getRepository(Page::class);
+        $repository = $em->getRepository(Module::class);
 
-        $pages = $repository->findAll();
+        $modules = $repository->findAll();
 
-        return $this->render('user/pages.html.twig', ['pages' => $pages]);
+        return $this->render('user/modules.html.twig', ['modules' => $modules]);
     }
 
     public function getRolesHierarchy() {
@@ -411,7 +411,7 @@ class UserController extends Controller
     }
 
     /**
-     * @Route("/get_page_by_id")
+     * @Route("/get_module_by_id")
      * @Method({"POST"})
      *
      * @ApiDoc(
@@ -423,7 +423,7 @@ class UserController extends Controller
      *   }
      * )
      */
-    public function getPageByIdAction(Request $request){
+    public function getModuleByIdAction(Request $request){
         if (!$this->isLoggedInAction()) {
             return $this->redirect($this->generateUrl('app_user_login'));
         }
@@ -436,20 +436,20 @@ class UserController extends Controller
         }
         $id = $data['id'];
         $em = $this->getDoctrine()->getManager();
-        $repository = $em->getRepository(Page::class);
+        $repository = $em->getRepository(Module::class);
 
-        $page = $repository->find($id);
+        $module = $repository->find($id);
 
-        if ($page === null) {
-            $errors[] = 'Page Not Found';
+        if ($module === null) {
+            $errors[] = 'Module Not Found';
         }
         else{
-            $pageInfo = [];
-            $pageInfo['id'] = $page->getId();
-            $pageInfo['name'] = $page->getName();
-            $pageInfo['route'] = $page->getRoute();
+            $moduleInfo = [];
+            $moduleInfo['id'] = $module->getId();
+            $moduleInfo['name'] = $module->getName();
+            $moduleInfo['route'] = $module->getRoute();
 
-            return new JsonResponse($pageInfo);
+            return new JsonResponse($moduleInfo);
         }
 
         return new JsonResponse($errors, 400);
@@ -580,7 +580,7 @@ class UserController extends Controller
     }
 
     /**
-     * @Route("/add_page")
+     * @Route("/add_module")
      * @Method({"POST"})
      *
      * @ApiDoc(
@@ -592,7 +592,7 @@ class UserController extends Controller
      *   }
      * )
      */
-    public function addPageAction(Request $request){
+    public function addModuleAction(Request $request){
         if(!$this->isLoggedInAction()) {
             return $this->redirect('login');
         }
@@ -606,30 +606,30 @@ class UserController extends Controller
         $em = $this->getDoctrine()->getManager();
         $repository = $em->getRepository(User::class);
 
-        $page = new Page();
-        $page->setName($data['name']);
-        $page->setRoute($data['route']);
+        $module = new Module();
+        $module->setName($data['name']);
+        $module->setRoute($data['route']);
 
         $userInfo = $this->get('session')->get($_COOKIE['X-TOKEN']);
 
         $user = $repository->find($userInfo['id']);
 
-        $page->setCreatedBy($user);
-        $page->setUpdatedBy($user);
+        $module->setCreatedBy($user);
+        $module->setUpdatedBy($user);
 
-        $em->persist($page);
+        $em->persist($module);
         $em->flush();
 
-        $repository = $em->getRepository(Page::class);
-        $pages = $repository->findAll();
+        $repository = $em->getRepository(Module::class);
+        $modules = $repository->findAll();
 
-        $pagesList = $this->renderView('user/pages_list.html.twig', ['pages' => $pages]);
+        $modulesList = $this->renderView('user/modules_list.html.twig', ['modules' => $modules]);
 
-        return new JsonResponse(['pages' => $pagesList], Response::HTTP_OK);
+        return new JsonResponse(['modules' => $modulesList], Response::HTTP_OK);
     }
 
     /**
-     * @Route("/update_page")
+     * @Route("/update_module")
      * @Method({"POST"})
      *
      * @ApiDoc(
@@ -641,7 +641,7 @@ class UserController extends Controller
      *   }
      * )
      */
-    public function updatePageAction(Request $request){
+    public function updateModuleAction(Request $request){
         if (!$this->isLoggedInAction()) {
             return $this->redirect($this->generateUrl('app_user_login'));
         }
@@ -653,25 +653,25 @@ class UserController extends Controller
         }
         $id = $data['id'];
         $em = $this->getDoctrine()->getManager();
-        $repository = $em->getRepository(Page::class);
+        $repository = $em->getRepository(Module::class);
 
-        $page = $repository->find($id);
+        $module = $repository->find($id);
 
-        if ($page === null) {
-            $errors[] = 'Page Not Found';
+        if ($module === null) {
+            $errors[] = 'Module Not Found';
         }
         else{
             if(isset($data['name']) && $data['name']){
-                $page->setName($data['name']);
+                $module->setName($data['name']);
             }
             if(isset($data['route']) && $data['route']){
-                $page->setRoute($data['route']);
+                $module->setRoute($data['route']);
             }
 
-            $em->persist($page);
+            $em->persist($module);
             $em->flush();
 
-            return new JsonResponse($page->getId());
+            return new JsonResponse($module->getId());
         }
 
         return new JsonResponse($errors, 400);
