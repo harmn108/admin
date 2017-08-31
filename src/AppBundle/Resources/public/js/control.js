@@ -5,20 +5,19 @@ function Control() {
 Control.prototype.Init = function () {
     var obj = this;
 
-    this.base_url = document.location.origin;
     obj.menu_item = $("a.control_menu_item");
-    obj.update_user_modal = $("#control_update_user");
+    obj.updateUserModal = $("#control_update_user");
     obj.addUM = $("#control_add_user");
-    obj.add_user_btn = $("#add_user_btn");
+    obj.addUserBtn = $("#add_user_btn");
 
-    obj.update_um_f_name = obj.update_user_modal.find('input.f_name');
-    obj.update_um_l_name = obj.update_user_modal.find('input.l_name');
-    obj.update_um_email = obj.update_user_modal.find('input.email');
-    obj.update_um_userid = obj.update_user_modal.find('input.userid');
-    obj.update_um_password = obj.update_user_modal.find('input.password');
-    obj.update_um_cpassword = obj.update_user_modal.find('input.cpassword');
+    obj.update_um_f_name = obj.updateUserModal.find('input.f_name');
+    obj.update_um_l_name = obj.updateUserModal.find('input.l_name');
+    obj.update_um_email = obj.updateUserModal.find('input.email');
+    obj.update_um_userid = obj.updateUserModal.find('input.userid');
+    obj.update_um_password = obj.updateUserModal.find('input.password');
+    obj.update_um_cpassword = obj.updateUserModal.find('input.cpassword');
 
-    obj.update_um_save = obj.update_user_modal.find('button.save');
+    obj.update_um_save = obj.updateUserModal.find('button.save');
 
     obj.userListTable = $("#user_list_table")
 
@@ -30,7 +29,7 @@ Control.prototype.Init = function () {
         if(typeof user.id !== 'undefined'){
             obj.fillUpdateUMFields(user);
             $('#update_um_form input').trigger('change');
-            obj.update_user_modal.modal('show');
+            obj.updateUserModal.modal('show');
         }
     });
 
@@ -41,11 +40,14 @@ Control.prototype.Init = function () {
         var result = obj.updateUser(formData);
 
         if(result){
-            obj.update_user_modal.modal('hide');
+            if(obj.userListTable.length){
+                obj.userListTable.find('tbody').html(result.users);
+            }
+            obj.updateUserModal.modal('hide');
         }
     });
 
-    obj.add_user_btn.on('click', function(event){
+    obj.addUserBtn.on('click', function(event){
         event.preventDefault();
         var roleId = $(this).data('roleid');
         $("#add_um_form")[0].reset();
@@ -65,9 +67,22 @@ Control.prototype.Init = function () {
             obj.addUM.modal('hide');
         }
     });
+
+    $(document).on("click","#user_list_table .update_user",function() {
+        var userId = $(this).closest('tr').data('id');
+
+        var user = obj.getUserById(userId);
+
+        if(typeof user.id !== 'undefined'){
+            obj.fillUpdateUMFields(user);
+            $('#update_um_form').find('input').trigger('change');
+            obj.updateUserModal.modal('show');
+        }
+    });
 };
 
 Control.prototype.getUserById = function (id) {
+    var obj = this;
     var userInfo;
     $.ajax({
         method: "POST",
@@ -91,29 +106,7 @@ Control.prototype.fillUpdateUMFields = function (user) {
     obj.update_um_f_name.val(user.firstName);
     obj.update_um_l_name.val(user.lastName);
     obj.update_um_email.val(user.email);
-    obj.update_um_userid.val(obj.userId);
-};
-
-Control.prototype.generateUpdateUserData = function () {
-    var obj = this;
-    var userData = {};
-
-    userData.firstName = obj.update_um_f_name.val();
-    userData.lastName = obj.update_um_l_name.val();
-    userData.email = obj.update_um_email.val();
-    userData.id = obj.update_um_userid.val();
-
-    if(obj.update_um_password.val() !== ''){
-        userData.password = obj.update_um_password.val();
-        var cpassword = obj.update_um_cpassword.val();
-
-        if(userData.password !== cpassword){
-            alert('Passwords do not match');
-            return false;
-        }
-    }
-
-    return userData;
+    obj.update_um_userid.val(user.id);
 };
 
 Control.prototype.updateUser = function (data) {
