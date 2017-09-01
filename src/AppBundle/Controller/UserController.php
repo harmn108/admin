@@ -255,13 +255,11 @@ class UserController extends Controller
                 $usersArray[$item->getId()]['updatedAt'] = $item->getUpdatedAt();
             }
         }
-
         return $this->render('user/control.html.twig', [
             'rolesHierarchy' => $rolesHierarchy,
             'users' => $usersArray,
             'roleId' => $id
         ]);
-
     }
 
     /**
@@ -379,8 +377,8 @@ class UserController extends Controller
         $data = $request->request->all();
 
         $errors = [];
-        if (!isset($data['id'])) {
-            $errors[] = 'Invalid Request';
+        if (!isset($data['id']) && !$data['id']) {
+            $errors[] = Response::$statusTexts[Response::HTTP_BAD_REQUEST];
         }
         $id = $data['id'];
         $em = $this->getDoctrine()->getManager();
@@ -407,7 +405,7 @@ class UserController extends Controller
             return new JsonResponse($userInfo);
         }
 
-        return new JsonResponse($errors, 400);
+        return new JsonResponse($errors, Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -431,7 +429,7 @@ class UserController extends Controller
         $data = $request->request->all();
 
         $errors = [];
-        if (!isset($data['id'])){
+        if (!isset($data['id']) && !$data['id']){
             $errors[] = 'Invalid Request';
         }
         $id = $data['id'];
@@ -452,7 +450,7 @@ class UserController extends Controller
             return new JsonResponse($moduleInfo);
         }
 
-        return new JsonResponse($errors, 400);
+        return new JsonResponse($errors, Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -470,13 +468,14 @@ class UserController extends Controller
      * )
      */
     public function updateUserAction(Request $request){
+
         if(!$this->isLoggedInAction()) {
             return $this->redirect('login');
         }
         $data = $request->request->all();
 
         $errors = [];
-        if (!isset($data['id'])) {
+        if (!isset($data['id']) && !$data['id']) {
             $errors[] = 'Invalid Request';
         }
         $id = $data['id'];
@@ -504,7 +503,9 @@ class UserController extends Controller
             if(isset($data['password']) && $data['password']){
                 $user->setPassword(md5($data['password']));
             }
+        }
 
+        if (empty($errors)) {
             $em->persist($user);
             $em->flush();
 
@@ -515,7 +516,7 @@ class UserController extends Controller
             return new JsonResponse(['users' => $usersList]);
         }
 
-        return new JsonResponse($errors, 400);
+        return new JsonResponse($errors, Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -549,39 +550,53 @@ class UserController extends Controller
         $em = $this->getDoctrine()->getManager();
         $role = $em->getRepository(Role::class)->find($roleId);
 
-        $user = new User();
+        if($role === null){
+            $errors[] = "Role Not Found";
+        }
+        else{
+            $user = new User();
 
-        $user->setRoleId($role);
+            $user->setRoleId($role);
 
-        if(isset($data['firstName']) && $data['firstName']){
-            $user->setFirstName($data['firstName']);
-        }
-        if(isset($data['lastName']) && $data['lastName']){
-            $user->setLastName($data['lastName']);
-        }
-        if(isset($data['email']) && $data['email']){
-            $user->setEmail($data['email']);
-        }
-        if(isset($data['password']) && $data['password']){
-            $user->setPassword(md5($data['password']));
+            if(isset($data['firstName']) && $data['firstName']){
+                $user->setFirstName($data['firstName']);
+            }
+            if(isset($data['lastName']) && $data['lastName']){
+                $user->setLastName($data['lastName']);
+            }
+            if(isset($data['email']) && $data['email']){
+                $user->setEmail($data['email']);
+            }
+            if(isset($data['password']) && $data['password']){
+                $user->setPassword(md5($data['password']));
+            }
         }
 
         $userInfo = $this->get('session')->get($_COOKIE['X-TOKEN']);
 
         $currentUser = $em->getRepository(User::class)->find($userInfo['id']);
 
-        $user->setCreatedBy($currentUser);
-        $user->setUpdatedBy($currentUser);
+        if ($currentUser === null){
+           $errors[] = "Nor Found who add user";
+        }
+        else {
+            $user->setCreatedBy($currentUser);
+            $user->setUpdatedBy($currentUser);
+        }
 
-        $em->persist($user);
-        $em->flush();
+        if(empty($errors)){
+            $em->persist($user);
+            $em->flush();
 
-        $repository = $em->getRepository(User::class);
-        $users = $repository->findBy(['roleId' => $roleId]);
+            $repository = $em->getRepository(User::class);
+            $users = $repository->findBy(['roleId' => $roleId]);
 
-        $usersList = $this->renderView('user/user_list.html.twig', ['users' => $users]);
+            $usersList = $this->renderView('user/user_list.html.twig', ['users' => $users]);
 
-        return new JsonResponse(['users' => $usersList], Response::HTTP_OK);
+            return new JsonResponse(['users' => $usersList], Response::HTTP_OK);
+        }
+
+        return new JsonResponse($errors, Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -603,9 +618,10 @@ class UserController extends Controller
         }
 
         $data = $request->request->all();
+        $errors = [];
 
         if((!isset($data['name']) || $data['name'] == '') || (!isset($data['route']) || $data['route'] == '')){
-            return new JsonResponse(Response::$statusTexts[Response::HTTP_BAD_REQUEST], Response::HTTP_BAD_REQUEST);
+            $errors[] = Response::$statusTexts[Response::HTTP_BAD_REQUEST];
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -619,18 +635,27 @@ class UserController extends Controller
 
         $user = $repository->find($userInfo['id']);
 
-        $module->setCreatedBy($user);
-        $module->setUpdatedBy($user);
+        if($user === null){
+            $errors[] = Response::$statusTexts[Response::HTTP_NOT_FOUND];
+        }
+        else{
+            $module->setCreatedBy($user);
+            $module->setUpdatedBy($user);
+        }
 
-        $em->persist($module);
-        $em->flush();
+        if(empty($errors)){
+            $em->persist($module);
+            $em->flush();
 
-        $repository = $em->getRepository(Module::class);
-        $modules = $repository->findAll();
+            $repository = $em->getRepository(Module::class);
+            $modules = $repository->findAll();
 
-        $modulesList = $this->renderView('user/modules_list.html.twig', ['modules' => $modules]);
+            $modulesList = $this->renderView('user/modules_list.html.twig', ['modules' => $modules]);
 
-        return new JsonResponse(['modules' => $modulesList], Response::HTTP_OK);
+            return new JsonResponse(['modules' => $modulesList], Response::HTTP_OK);
+        }
+
+        return new JsonResponse($errors, Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -654,7 +679,7 @@ class UserController extends Controller
 
         $errors = [];
         if (!isset($data['id'])){
-            $errors[] = 'Invalid Request';
+            $errors[] = Response::$statusTexts[Response::HTTP_BAD_REQUEST];
         }
         $id = $data['id'];
         $em = $this->getDoctrine()->getManager();
@@ -672,13 +697,15 @@ class UserController extends Controller
             if(isset($data['route']) && $data['route']){
                 $module->setRoute($data['route']);
             }
+        }
 
+        if (empty($errors)){
             $em->persist($module);
             $em->flush();
 
             return new JsonResponse($module->getId());
         }
 
-        return new JsonResponse($errors, 400);
+        return new JsonResponse($errors, Response::HTTP_BAD_REQUEST);
     }
 }

@@ -94,6 +94,13 @@ Control.prototype.getUserById = function (id) {
         },
         success: function (result) {
             userInfo = result;
+        },
+        error: function(result) {
+            bootbox.alert({
+                size: "small",
+                title: "Error Alert",
+                message: result.responseJSON.join('<br>')
+            });
         }
     });
 
@@ -120,6 +127,13 @@ Control.prototype.updateUser = function (data) {
         data: data,
         success: function (data) {
             result = data;
+        },
+        error: function(result, error_text) {
+            bootbox.alert({
+                size: "small",
+                title: "Error Alert",
+                message: result.responseJSON.join('<br>')
+            });
         }
     });
 
@@ -137,6 +151,13 @@ Control.prototype.addUser = function (data) {
         data: data,
         success: function (data) {
             result = data;
+        },
+        error: function(result) {
+            bootbox.alert({
+                size: "small",
+                title: "Error Alert",
+                message: result.responseJSON.join('<br>')
+            });
         }
     });
 
