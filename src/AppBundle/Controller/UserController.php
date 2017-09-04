@@ -636,14 +636,25 @@ class UserController extends Controller
         }
 
         $em = $this->getDoctrine()->getManager();
-        $repository = $em->getRepository(User::class);
+
 
         $module = new Module();
         $module->setName($data['name']);
         $module->setRoute($data['route']);
 
+        $repository = $em->getRepository(Module::class);
+
+        $maxOrderRow = $repository->findBy(array(), array('order'=>'DESC'), 1);
+
+        /**
+         * @var $user User
+         */
+        $nextOrder = ($maxOrderRow && $maxOrderRow[0]) ? ($maxOrderRow[0]->getOrder() + 1) : 0;
+        $module->setOrder($nextOrder); // need change
+
         $userInfo = $this->get('session')->get($_COOKIE['X-TOKEN']);
 
+        $repository = $em->getRepository(User::class);
         $user = $repository->find($userInfo['id']);
 
         if($user === null){
