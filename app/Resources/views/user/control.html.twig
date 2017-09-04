@@ -12,7 +12,7 @@
                 <div class="panel-heading">User Types</div>
                 <div class="panel-body">
                     {% import _self as macros %}
-                    <ul>
+                    <ul class="nav nav-pills nav-stacked">
                         {{ macros.menu_links(rolesHierarchy, userInfo) }}
                     </ul>
                 </div>
@@ -22,7 +22,7 @@
                 <div class="panel-heading">Website options</div>
                 <div class="panel-body">
                     <ul class="nav nav-pills nav-stacked">
-                        <li class="active"><a href="">Website name</a></li>
+                        <li class="active"><a href="{{ path('app_control') }}">Website name</a></li>
                         <li class=""><a href="">Metadata</a></li>
                         <li class=""><a href="">Status</a></li>
                         <li class=""><a href="">Update Languages</a></li>
@@ -61,7 +61,7 @@
                 {% endif %}
 
             {% else %}
-                {% include 'websiteOptions/website_name.html.twig' with {'name': 'Admin Web Site'} %} {#TODO this name toBe Dinamic#}
+                {% include 'websiteOptions/website_name.html.twig' %}
             {% endif %}
         </div>
 
@@ -210,7 +210,10 @@
 
 {% block javascripts %}
     {{ parent() }}
-    {% javascripts '@AppBundle/Resources/public/js/control.js' %}
+    {% javascripts
+        '@AppBundle/Resources/public/js/control.js'
+        '@AppBundle/Resources/public/js/website.js'
+    %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock %}
