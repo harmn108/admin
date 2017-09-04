@@ -12,7 +12,7 @@ Website.prototype.Init = function () {
 
         var result = obj.saveWebsiteName(formData);
 
-        if(result && result.websiteOptions.id !== 'undefined'){
+        if(result && typeof result.websiteOptions.id !== 'undefined'){
             $(this).find('input.id').val(result.websiteOptions.id);
             Main.notify('success', 'Website name successfully saved');
             return true;
@@ -40,6 +40,9 @@ Website.prototype.saveWebsiteName = function (data) {
         error: function(data) {
             if(data && typeof data.responseJSON !== 'undefined'){
                 Main.notify('danger', data.responseJSON);
+            }
+            else {
+                Main.notify('danger', 'Something went wrong please try again later');
             }
         }
     });

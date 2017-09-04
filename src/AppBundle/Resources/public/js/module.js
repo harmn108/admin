@@ -18,9 +18,13 @@ Module.prototype.Init = function () {
         var moduleId = $(event.target).closest('tr').data('id');
         var module = obj.getModuleById(moduleId);
 
-        obj.selectedModuleId.val(moduleId);
+        if(module && typeof module.name !== 'undefined' && typeof module.route !== 'undefined'){
+            obj.updateName.val(module.name);
+            obj.updateRoute.val(module.route);
+        }
 
         if(typeof moduleId !== 'undefined'){
+            obj.selectedModuleId.val(moduleId);
             obj.updateModuleForm.find('input').trigger('change');
             obj.updateModuleModal.modal('show');
         }
@@ -32,10 +36,11 @@ Module.prototype.Init = function () {
 
         var result = obj.addModuleAction(formData);
 
-        if(result){
+        if(result && typeof result.modules !== 'undefined'){
             obj.modulesListTable.find('tbody').html(result.modules);
             obj.addModuleModal.modal('hide');
             obj.addModuleForm[0].reset();
+            Main.notify('success', 'Module successfully added');
         }
     });
 
@@ -43,14 +48,22 @@ Module.prototype.Init = function () {
         e.preventDefault();
         var formData = $(this).serialize();
 
-        obj.updateModuleData(formData);
+        var result = obj.updateModuleData(formData);
+
+        if(result){
+            var updatedRow = obj.modulesListTable.find('tr[data-id="'+ result +'"]');
+            updatedRow.find('.module_route').text(obj.updateModuleForm.find('.name').val());
+            updatedRow.find('.module_route').attr('href', obj.updateModuleForm.find('.route').val());
+            obj.updateModuleForm[0].reset();
+            obj.updateModuleModal.modal('hide');
+            Main.notify('success', 'Module successfully updated');
+        }
     });
 };
 
 
 Module.prototype.getModuleById = function (id) {
-    var obj = this;
-    var userInfo;
+    var result = false;
 
     $.ajax({
         method: "POST",
@@ -60,19 +73,23 @@ Module.prototype.getModuleById = function (id) {
         data: {
             id: id
         },
-        success: function (result) {
-            userInfo = result;
-            obj.updateName.val(result.name);
-            obj.updateRoute.val(result.route);
+        success: function (data) {
+            result = data;
+        },
+        error: function(data) {
+            if(data && typeof data.responseJSON !== 'undefined'){
+                Main.notify('danger', data.responseJSON);
+            } else {
+                Main.notify('danger', 'Something went wrong please try again later');
+            }
         }
     });
 
-    return userInfo;
+    return result;
 };
 
 Module.prototype.updateModuleData = function (data) {
-    var obj = this;
-
+    var result = false;
     $.ajax({
         method: "POST",
         url: 'update_module',
@@ -80,17 +97,22 @@ Module.prototype.updateModuleData = function (data) {
         async: false,
         data: data,
         success: function (data) {
-            var updatedRow = obj.modulesListTable.find('tr[data-id="'+ data +'"]');
-            updatedRow.find('.module_route').text(obj.updateModuleForm.find('.name').val());
-            updatedRow.find('.module_route').attr('href', obj.updateModuleForm.find('.route').val());
-            obj.updateModuleForm[0].reset();
-            obj.updateModuleModal.modal('hide');
+            result = data;
+        },
+        error: function(data) {
+            if(data && typeof data.responseJSON !== 'undefined'){
+                Main.notify('danger', data.responseJSON);
+            } else {
+                Main.notify('danger', 'Something went wrong please try again later');
+            }
         }
     });
+
+    return result;
 };
 
 Module.prototype.addModuleAction = function (data) {
-    var result;
+    var result = false;
 
     $.ajax({
         method: "POST",
@@ -100,6 +122,13 @@ Module.prototype.addModuleAction = function (data) {
         data: data,
         success: function (data) {
             result = data;
+        },
+        error: function(data) {
+            if(data && typeof data.responseJSON !== 'undefined'){
+                Main.notify('danger', data.responseJSON);
+            } else {
+                Main.notify('danger', 'Something went wrong please try again later');
+            }
         }
     });
 
