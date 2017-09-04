@@ -33,8 +33,13 @@ Access.prototype.addRole = function (data) {
         success: function (data) {
             result = data;
         },
-        error: function(result) {
-            // add alert
+        error: function(data) {
+            if(data && typeof data.responseJSON !== 'undefined'){
+                Main.notify('danger', data.responseJSON);
+            }
+            else {
+                Main.notify('danger', 'Something went wrong please try again later');
+            }
         }
     });
 

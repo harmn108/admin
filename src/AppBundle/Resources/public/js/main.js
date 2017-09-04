@@ -19,7 +19,9 @@ Main.prototype.notify = function (type, message) {
         message: message
     },{
         // settings
-        type: type
+        element: 'body',
+        type: type,
+        z_index: 10000
     });
 };
 

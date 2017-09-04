@@ -101,6 +101,9 @@ Control.prototype.getUserById = function (id) {
             if(data && typeof data.responseJSON !== 'undefined'){
                 Main.notify('danger', data.responseJSON)
             }
+            else {
+                Main.notify('danger', 'Something went wrong please try again later');
+            }
         }
     });
 
@@ -132,6 +135,9 @@ Control.prototype.updateUser = function (data) {
             if(data && typeof data.responseJSON !== 'undefined'){
                 Main.notify('danger', data.responseJSON)
             }
+            else {
+                Main.notify('danger', 'Something went wrong please try again later');
+            }
         }
     });
 
@@ -153,6 +159,9 @@ Control.prototype.addUser = function (data) {
         error: function(data) {
             if(data && typeof data.responseJSON !== 'undefined'){
                 Main.notify('danger', data.responseJSON)
+            }
+            else {
+                Main.notify('danger', 'Something went wrong please try again later');
             }
         }
     });
