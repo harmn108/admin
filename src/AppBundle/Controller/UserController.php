@@ -310,7 +310,7 @@ class UserController extends Controller
         $em = $this->getDoctrine()->getManager();
         $repository = $em->getRepository(Module::class);
 
-        $modules = $repository->findAll();
+        $modules = $repository->findBy(array(), array('order'=>'asc'));
 
         return $this->render('user/modules.html.twig', ['modules' => $modules]);
     }
