@@ -26,7 +26,7 @@ Control.prototype.Init = function () {
         obj.userId = $(this).data('userid');
         var user = obj.getUserById(obj.userId);
 
-        if(typeof user.id !== 'undefined'){
+        if(user && typeof user.id !== 'undefined'){
             obj.fillUpdateUMFields(user);
             $('#update_um_form input').trigger('change');
             obj.updateUserModal.modal('show');
@@ -44,6 +44,7 @@ Control.prototype.Init = function () {
                 obj.userListTable.find('tbody').html(result.users);
             }
             obj.updateUserModal.modal('hide');
+            Main.notify('success', 'User successfully updated')
         }
     });
 
@@ -65,6 +66,7 @@ Control.prototype.Init = function () {
         if(result){
             obj.userListTable.find('tbody').html(result.users);
             obj.addUM.modal('hide');
+            Main.notify('success', 'User successfully added')
         }
     });
 
@@ -73,7 +75,7 @@ Control.prototype.Init = function () {
 
         var user = obj.getUserById(userId);
 
-        if(typeof user.id !== 'undefined'){
+        if(user && typeof user.id !== 'undefined'){
             obj.fillUpdateUMFields(user);
             $('#update_um_form').find('input').trigger('change');
             obj.updateUserModal.modal('show');
@@ -83,7 +85,7 @@ Control.prototype.Init = function () {
 
 Control.prototype.getUserById = function (id) {
     var obj = this;
-    var userInfo;
+    var result;
     $.ajax({
         method: "POST",
         url: 'get_user_by_id',
@@ -92,19 +94,17 @@ Control.prototype.getUserById = function (id) {
         data: {
             id: id
         },
-        success: function (result) {
-            userInfo = result;
+        success: function (data) {
+            result = data;
         },
-        error: function(result) {
-            bootbox.alert({
-                size: "small",
-                title: "Error Alert",
-                message: result.responseJSON.join('<br>')
-            });
+        error: function(data) {
+            if(data && typeof data.responseJSON !== 'undefined'){
+                Main.notify('danger', data.responseJSON)
+            }
         }
     });
 
-    return userInfo;
+    return result;
 };
 
 Control.prototype.fillUpdateUMFields = function (user) {
@@ -117,7 +117,7 @@ Control.prototype.fillUpdateUMFields = function (user) {
 };
 
 Control.prototype.updateUser = function (data) {
-    var result;
+    var result = false;
 
     $.ajax({
         method: "POST",
@@ -128,12 +128,10 @@ Control.prototype.updateUser = function (data) {
         success: function (data) {
             result = data;
         },
-        error: function(result, error_text) {
-            bootbox.alert({
-                size: "small",
-                title: "Error Alert",
-                message: result.responseJSON.join('<br>')
-            });
+        error: function(result) {
+            if(data && typeof data.responseJSON !== 'undefined'){
+                Main.notify('danger', data.responseJSON)
+            }
         }
     });
 
@@ -141,7 +139,7 @@ Control.prototype.updateUser = function (data) {
 };
 
 Control.prototype.addUser = function (data) {
-    var result;
+    var result = false;
 
     $.ajax({
         method: "POST",
@@ -152,12 +150,10 @@ Control.prototype.addUser = function (data) {
         success: function (data) {
             result = data;
         },
-        error: function(result) {
-            bootbox.alert({
-                size: "small",
-                title: "Error Alert",
-                message: result.responseJSON.join('<br>')
-            });
+        error: function(data) {
+            if(data && typeof data.responseJSON !== 'undefined'){
+                Main.notify('danger', data.responseJSON)
+            }
         }
     });
 

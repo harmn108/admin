@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Module;
 use AppBundle\Entity\Role;
 use AppBundle\Entity\User;
+use AppBundle\Entity\WebsiteOptions;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -133,6 +134,16 @@ class UserController extends Controller
                 $userInfo['roleName'] = $user->getRoleId()->getName();
 
                 $userInfo['pages'] = ['Structure', 'Media', 'Article']; // from DB
+                /**
+                 * @var $options WebsiteOptions
+                 */
+                $options = $em->getRepository(WebsiteOptions::class)->findOneBy(['createdBy' => $user]);
+                if($options !== null && $options){
+                    $userInfo['websiteOptions'] = [
+                        'id' => $options->getId(),
+                        'name' => $options->getName()
+                    ];
+                }
 
                 $session->set($token, $userInfo);
 
