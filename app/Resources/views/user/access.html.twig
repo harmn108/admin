@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
-                <div class="panel-heading">Panel Content</div>
+                <div class="panel-heading">User Types</div>
                 <div class="panel-body">
                     {% import _self as macros %}
                     <ul class="">
@@ -20,10 +20,45 @@
 
 {% block bodyRight %}
     <div class="row">
-        <div class="col-lg-12">test2</div>
+        <div class="col-lg-12">
+            <button type="button" class="btn btn-primary m-bottom-10 pull-right" data-toggle="modal" data-target="#add_role_modal">
+                Add New Role
+            </button>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="add_role_modal">
+        <div class="modal-dialog" role="document">
+            <form data-toggle="validator" role="form" id="add_role_form">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Add New Module</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="name" class="control-label">Name:</label>
+                            <input id="name" name="name" type="text" value="" class="form-control f_name" required/>
+                            <div class="help-block with-errors"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sel1">Sub:</label>
+                            <select class="form-control" name="parent" id="roles"></select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary save">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 {% endblock %}
-
 
 {% macro menu_links(rolesHierarchy) %}
     {% import _self as macros %}
@@ -38,3 +73,11 @@
         </li>
     {% endfor %}
 {% endmacro %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts '@AppBundle/Resources/public/js/access.js' %}
+        <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+

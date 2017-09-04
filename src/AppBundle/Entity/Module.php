@@ -36,6 +36,12 @@ class Module
     private $route;
 
     /**
+     * @var integer $order
+     * @ORM\column(name="`order`", type="integer", options={"default"=0})
+     */
+    private $order;
+
+    /**
      * @var integer $createdBy
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="created_by", referencedColumnName="id")
@@ -119,6 +125,30 @@ class Module
     public function getRoute()
     {
         return $this->route;
+    }
+
+    /**
+     * Set order
+     *
+     * @param integer $order
+     *
+     * @return Module
+     */
+    public function setOrder($order)
+    {
+        $this->order = $order;
+
+        return $this;
+    }
+
+    /**
+     * Get order
+     *
+     * @return integer
+     */
+    public function getOrder()
+    {
+        return $this->order;
     }
 
     /**
