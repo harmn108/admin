@@ -708,4 +708,59 @@ class UserController extends Controller
 
         return new JsonResponse($errors, Response::HTTP_BAD_REQUEST);
     }
+
+    /**
+     * @Route("/add_role")
+     * @Method({"POST"})
+     *
+     * @ApiDoc(
+     *   resource=true,
+     *   description="This REST is ",
+     *   statusCodes={
+     *     200="Success",
+     *     404="Not found"
+     *   }
+     * )
+     */
+    public function addRoleAction(Request $request){
+        if(!$this->isLoggedInAction()) {
+            return $this->redirect('login');
+        }
+
+        $data = $request->request->all();
+
+        $errors = [];
+
+        if((!isset($data['name']) || $data['name'] == '') || (!isset($data['parent']) || $data['parent'] == '')){
+            $errors[] = Response::$statusTexts[Response::HTTP_BAD_REQUEST];
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $repository = $em->getRepository(User::class);
+
+        $role = new Role();
+        $role->setName($data['name']);
+        $role->setIdParent($data['parent']);
+
+        $userInfo = $this->get('session')->get($_COOKIE['X-TOKEN']);
+
+        $user = $repository->find($userInfo['id']);
+
+        if($user === null){
+            $errors[] = Response::$statusTexts[Response::HTTP_NOT_FOUND];
+        }
+        else{
+            $role->setCreatedBy($user);
+            $role->setUpdatedBy($user);
+        }
+
+        if(empty($errors)){
+            $em->persist($role);
+            $em->flush();
+
+            return new JsonResponse(Response::$statusTexts[Response::HTTP_OK], Response::HTTP_OK);
+        }
+
+        return new JsonResponse($errors, Response::HTTP_BAD_REQUEST);
+    }
 }
