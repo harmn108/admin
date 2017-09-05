@@ -24,6 +24,10 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+
+    }
 
     /**
      * @Route("/")
@@ -60,7 +64,7 @@ class UserController extends Controller
      */
     public function loginAction(Request $request)
     {
-        if ($this->isLoggedInAction()) {
+        if ($this->get('app_main')->isLoggedInAction()) {
             return $this->redirect($this->generateUrl('app_user_admin'));
         }
 
@@ -172,30 +176,12 @@ class UserController extends Controller
      */
     public function adminAction()
     {
-        if (!$this->isLoggedInAction()) {
+
+        if (!$this->get('app_main')->isLoggedInAction()) {
             return $this->redirect($this->generateUrl('app_user_login'));
         }
 
         return $this->render('user/admin.html.twig');
-    }
-
-    private function isLoggedInAction()
-    {
-        if (isset($_COOKIE['X-TOKEN']) && $_COOKIE['X-TOKEN']) {
-            $em = $this->getDoctrine()->getManager();
-            $repository = $em->getRepository(User::class);
-
-            /**
-             * @var $user User
-             */
-            $user = $repository->findOneBy(['token' => md5($_COOKIE['X-TOKEN'])]);
-
-            if ($user !== null) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -239,8 +225,10 @@ class UserController extends Controller
      */
     public function controlAction(Request $request, $id = 0)
     {
-        if ($this->isLoggedInAction()) {
-            $rolesHierarchy = $this->getRolesHierarchy();
+        if ($this->get('app_main')->isLoggedInAction()) {
+            if(!$rolesHierarchy = $this->get('app_main')->getRolesHierarchy()){
+                return $this->redirect($this->generateUrl('app_user_logout'));
+            }
         } else {
             return $this->redirect($this->generateUrl('app_user_login'));
         }
@@ -288,8 +276,10 @@ class UserController extends Controller
      */
     public function accessAction()
     {
-        if ($this->isLoggedInAction()) {
-            $rolesHierarchy = $this->getRolesHierarchy();
+        if ($this->get('app_main')->isLoggedInAction()) {
+            if(!$rolesHierarchy = $this->get('app_main')->getRolesHierarchy()){
+                return $this->redirect($this->generateUrl('app_user_logout'));
+            }
         } else {
             return $this->redirect($this->generateUrl('app_user_login'));
         }
@@ -311,7 +301,7 @@ class UserController extends Controller
      * )
      */
     public function modulesAction(){
-        if(!$this->isLoggedInAction()){
+        if(!$this->get('app_main')->isLoggedInAction()){
             return $this->redirect('login');
         }
 
@@ -321,47 +311,6 @@ class UserController extends Controller
         $modules = $repository->findBy(array(), array('order'=>'asc'));
 
         return $this->render('user/modules.html.twig', ['modules' => $modules]);
-    }
-
-    public function getRolesHierarchy() {
-        $em = $this->getDoctrine()->getManager();
-        $repository = $em->getRepository(Role::class);
-
-        /**
-         * @var $user User
-         */
-        $roles = $repository->findAll();
-
-        $userInfo = $this->get('session')->get($_COOKIE['X-TOKEN']);
-
-        $rolesArray = [];
-        foreach ($roles as $item){
-            $rolesArray[$item->getId()] = [];
-
-            $rolesArray[$item->getId()]['id'] = $item->getId();
-            $rolesArray[$item->getId()]['idParent'] = $item->getIdParent();
-            $rolesArray[$item->getId()]['name'] = $item->getName();
-        }
-
-        $rolesHierarchy = $this->buildRolesTree($rolesArray, $userInfo['roleIdParent']);
-
-        return $rolesHierarchy;
-    }
-
-    private function buildRolesTree(array $elements, $parentId = 0) {
-        $branch = array();
-
-        foreach ($elements as $element) {
-            if ($element['idParent'] == $parentId) {
-                $children = $this->buildRolesTree($elements, $element['id']);
-                if ($children) {
-                    $element['children'] = $children;
-                }
-                $branch[] = $element;
-            }
-        }
-
-        return $branch;
     }
 
     /**
@@ -381,7 +330,7 @@ class UserController extends Controller
 
     public function getUserByIdAction(Request $request)
     {
-        if (!$this->isLoggedInAction()) {
+        if (!$this->get('app_main')->isLoggedInAction()) {
             return $this->redirect($this->generateUrl('app_user_login'));
         }
         $data = $request->request->all();
@@ -432,7 +381,7 @@ class UserController extends Controller
      * )
      */
     public function getModuleByIdAction(Request $request){
-        if (!$this->isLoggedInAction()) {
+        if (!$this->get('app_main')->isLoggedInAction()) {
             return $this->redirect($this->generateUrl('app_user_login'));
         }
 
@@ -479,7 +428,7 @@ class UserController extends Controller
      */
     public function updateUserAction(Request $request){
 
-        if(!$this->isLoggedInAction()) {
+        if(!$this->get('app_main')->isLoggedInAction()) {
             return $this->redirect('login');
         }
         $data = $request->request->all();
@@ -546,7 +495,7 @@ class UserController extends Controller
 
     public function addUserAction(Request $request)
     {
-        if (!$this->isLoggedInAction()) {
+        if (!$this->get('app_main')->isLoggedInAction()) {
             return $this->redirect($this->generateUrl('app_user_login'));
         }
         $data = $request->request->all();
@@ -623,7 +572,7 @@ class UserController extends Controller
      * )
      */
     public function addModuleAction(Request $request){
-        if(!$this->isLoggedInAction()) {
+        if(!$this->get('app_main')->isLoggedInAction()) {
             return $this->redirect('login');
         }
 
@@ -693,7 +642,7 @@ class UserController extends Controller
      * )
      */
     public function updateModuleAction(Request $request){
-        if (!$this->isLoggedInAction()) {
+        if (!$this->get('app_main')->isLoggedInAction()) {
             return $this->redirect($this->generateUrl('app_user_login'));
         }
         $data = $request->request->all();
@@ -744,7 +693,7 @@ class UserController extends Controller
      * )
      */
     public function addRoleAction(Request $request){
-        if(!$this->isLoggedInAction()) {
+        if(!$this->get('app_main')->isLoggedInAction()) {
             return $this->redirect('login');
         }
 

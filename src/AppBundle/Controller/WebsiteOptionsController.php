@@ -30,7 +30,7 @@ class WebsiteOptionsController extends Controller
      */
     public function saveWebsiteNameAction(Request $request){
         $data = $request->request->all();
-        if (!$this->isLoggedInAction()) {
+        if(!$this->get('app_main')->isLoggedInAction()) {
             return $this->redirect($this->generateUrl('app_user_login'));
         }
         $em = $this->getDoctrine()->getManager();
@@ -87,24 +87,5 @@ class WebsiteOptionsController extends Controller
         }
 
         return new JsonResponse($errors, Response::HTTP_BAD_REQUEST);
-    }
-
-    private function isLoggedInAction()
-    {
-        if (isset($_COOKIE['X-TOKEN']) && $_COOKIE['X-TOKEN']) {
-            $em = $this->getDoctrine()->getManager();
-            $repository = $em->getRepository(User::class);
-
-            /**
-             * @var $user User
-             */
-            $user = $repository->findOneBy(['token' => md5($_COOKIE['X-TOKEN'])]);
-
-            if ($user !== null) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
