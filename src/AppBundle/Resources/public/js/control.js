@@ -81,6 +81,10 @@ Control.prototype.Init = function () {
             obj.updateUserModal.modal('show');
         }
     });
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        $("#user_block_right").addClass('hidden');
+    });
 };
 
 Control.prototype.getUserById = function (id) {

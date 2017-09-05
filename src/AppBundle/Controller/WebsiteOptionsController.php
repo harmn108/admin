@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class WebsiteOptionsController extends Controller
 {
-
-
     /**
      * @Route("/website_name")
      * @Method({"POST"})
