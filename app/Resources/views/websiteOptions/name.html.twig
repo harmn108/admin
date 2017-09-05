@@ -1,0 +1,15 @@
+{% set key = app.request.cookies.get('X-TOKEN') %}
+{% set userInfo = app.session.get(key) %}
+
+<div class="m-top-20">
+    <form class="form-inline" data-toggle="validator" id="website_name_form">
+        <label class="" for="site_name">Website Name :</label>
+        <input type="hidden" class="id" name="id" value="{{ userInfo.websiteOptions.id is defined ? userInfo.websiteOptions.id : '' }}">
+        <input id="site_name" name="siteName" type="text" value="{{ userInfo.websiteOptions.name is defined ? userInfo.websiteOptions.name : '' }}" c
+               lass="form-control site_name" required/>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <div class="help-block with-errors"></div>
+    </form>
+</div>
+
+

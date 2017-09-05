@@ -2,31 +2,34 @@
 
 {% set key = app.request.cookies.get('X-TOKEN') %}
 {% set userInfo = app.session.get(key) %}
+{% set routh = app.request.get('_route') %}
 
 {% block title %}Control Panel{% endblock %}
 
 {% block bodyLeft %}
     <div class="row">
         <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">User Types</div>
-                <div class="panel-body">
-                    {% import _self as macros %}
-                    <ul class="nav nav-pills nav-stacked">
-                        {{ macros.menu_links(rolesHierarchy, userInfo) }}
-                    </ul>
+            {% if rolesHierarchy is defined %}
+                <div class="panel panel-default" id="user_block_left">
+                    <div class="panel-heading">User Types</div>
+                    <div class="panel-body">
+                        {% import _self as macros %}
+                        <ul class="nav nav-pills nav-stacked">
+                            {{ macros.menu_links(rolesHierarchy, userInfo) }}
+                        </ul>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
 
-            <div class="panel panel-default">
+            <div class="panel panel-default" id="website_options_block_left">
                 <div class="panel-heading">Website options</div>
                 <div class="panel-body">
-                    <ul class="nav nav-pills nav-stacked">
-                        <li class="active"><a href="{{ path('app_control') }}">Website name</a></li>
-                        <li class=""><a href="">Metadata</a></li>
-                        <li class=""><a href="">Status</a></li>
-                        <li class=""><a href="">Update Languages</a></li>
-                        <li class=""><a href="">Cache options</a></li>
+                    <ul class="nav nav-tabs nav-pills nav-stacked tabs-left" role="tablist">
+                        <li><a href="#website_name" data-toggle="tab">Website name</a></li>
+                        <li><a href="#metadata" data-toggle="tab">Metadata</a></li>
+                        <li><a href="#status" data-toggle="tab">Status</a></li>
+                        <li><a href="#upd_lang" data-toggle="tab">Update Languages</a></li>
+                        <li><a href="#cache_opt" data-toggle="tab">Cache options</a></li>
                     </ul>
                 </div>
             </div>
@@ -38,31 +41,48 @@
     <div class="row">
         <div class="col-lg-12">
             {% if roleId is defined and roleId != 0 %}
-                <button type="button" class="btn btn-primary m-bottom-10 pull-right" data-toggle="modal" id="add_user_btn"
-                        data-roleId="{{ roleId }}">
-                    Add User
-                </button>
+                <div id="user_block_right">
+                    <button type="button" class="btn btn-primary m-bottom-10 pull-right" data-toggle="modal" id="add_user_btn"
+                            data-roleId="{{ roleId }}">
+                        Add User
+                    </button>
 
-                {% if users is defined and users %}
-                    <table id="user_list_table" class="table table-striped table-bordered table-hover table-condensed"
-                           data-click-to-select="true">
-                        <thead>
-                        <tr class="success">
-                            <th>ID</th>
-                            <th>Email</th>
-                            <th>Name</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% include '/user/user_list.html.twig' with {'users': users} %}
-                        </tbody>
-                    </table>
-                {% endif %}
-
-            {% else %}
-                {% include 'websiteOptions/website_name.html.twig' %}
+                    {% if users is defined and users %}
+                        <table id="user_list_table" class="table table-striped table-bordered table-hover table-condensed"
+                               data-click-to-select="true">
+                            <thead>
+                                <tr class="success">
+                                    <th>ID</th>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% include '/user/user_list.html.twig' with {'users': users} %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
             {% endif %}
+
+            <div class="tab-content" id="website_options_block_right">
+                <div class="tab-pane" id="website_name">
+                    {% include 'websiteOptions/name.html.twig' %}
+                </div>
+                <div class="tab-pane" id="metadata">
+                    {% include 'websiteOptions/metadata.html.twig' %}
+                </div>
+                <div class="tab-pane" id="status">
+                    {% include 'websiteOptions/status.html.twig' %}
+                </div>
+                <div class="tab-pane" id="upd_lang">
+                    {% include 'websiteOptions/update_languages.html.twig' %}
+                </div>
+                <div class="tab-pane" id="cache_opt">
+                    {% include 'websiteOptions/cache_options.html.twig' %}
+                </div>
+            </div>
         </div>
 
         <div class="modal fade" tabindex="-1" role="dialog" id="control_update_user">
