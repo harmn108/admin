@@ -274,7 +274,7 @@ class UserController extends Controller
     }
 
     /**
-     * @Route("/access")
+     * @Route("/access", name="app_user_access")
      * @Method({"GET"})
      *
      * @ApiDoc(
@@ -288,7 +288,6 @@ class UserController extends Controller
      */
     public function accessAction()
     {
-
         if ($this->isLoggedInAction()) {
             $rolesHierarchy = $this->getRolesHierarchy();
         } else {
